@@ -1,12 +1,16 @@
 import RowTable from "./RowTable.tsx";
+import {useContext} from "react";
+import {ProductsContext} from "../utils/Context.ts";
 import type Product from "./Product.ts";
-import {Products} from "../utils/constants.ts";
 
-interface propsTable{
-    products: Product[];
-}
+const Table = () => {
 
-const Table = (props: propsTable) => {
+    const {products, setProducts} = useContext(ProductsContext);
+
+    const updateTable = (products: Product[]) => {
+        setProducts(products);
+    }
+
     return (
 
         <table className={"text-light-green"}>
@@ -22,7 +26,7 @@ const Table = (props: propsTable) => {
                 </tr>
             </thead>
             <tbody>
-                {Products.map(product => <RowTable key={product.id} product={product} />)}
+                {products.map(product => <RowTable key={product.id} product={product} updateTable={updateTable} />)}
             </tbody>
         </table>
     )

@@ -1,27 +1,32 @@
-import type {Product} from "../utils/types";
-import {Products} from "../utils/constants.ts";
+import {ProductsContext} from "../utils/Context.ts";
+import {useContext} from "react";
+import type Product from "./Product.ts";
 
 interface PropsProduct {
-    product: Product
+    product: Product,
+    updateTable: (products: Product[]) => void
 }
+
 
 const RowTable = (props: PropsProduct) => {
 
+    const {products, setProducts} = useContext(ProductsContext);
     const product = props.product;
 
     const editProduct = (id: number) => {
-        const index = Products.findIndex((product) => product.id === id);
+        const index = products.findIndex((product) => product.id === id);
         if (index >= 0){
-            const edit = true;
+            return  true;
         }
 
         return true;
     }
 
     const removeProduct = (id: number) => {
-        const index = Products.findIndex((product) => product.id === id);
+        const index = products.findIndex((product) => product.id === id);
         if (index >= 0){
-            Products.splice(index, 1);
+            const newProducts = products.filter((p) => p.id !== id);
+            setProducts(newProducts);
         }
     }
 
