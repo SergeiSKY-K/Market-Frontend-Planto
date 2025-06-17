@@ -1,35 +1,19 @@
-import AddProduct from "./AddProduct.tsx";
-import ProductsTable from "./ProductsTable.tsx";
-import {useEffect, useState} from "react";
-import {ProductsContext} from "../utils/Context.ts";
-import {getProductsTable} from "../features/api/productAction.ts";
-import Product from "./Product.ts";
+import {Route, Routes} from "react-router";
+import {navItems} from "../utils/constants.ts";
+import Home from "./Home.tsx";
+import ProductsManager from "./ProductsManager.tsx";
+import ErrorPage from "./ErrorPage.tsx";
 
 const Workspace = () => {
 
-    const [products, setProducts] = useState<Product[]>([]);
-
-    useEffect(() => {
-
-        const getProducts = async () => {
-            try{
-                const result = await getProductsTable();
-                setProducts(result)
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
-        getProducts();
-    }, [])
-
     return (
-        <div className={"col-span-6"}>
-            <ProductsContext.Provider value={{products, setProducts}}>
-                <AddProduct/>
-                <ProductsTable/>
-            </ProductsContext.Provider>
-        </div>
+        <Routes>
+            {['/', navItems[0].path, `${navItems[0].path}/`].map(path =>
+                <Route key={path} path={path} element={<Home/>}/>)}
+            {['/', navItems[1].path, `${navItems[1].path}/`].map(path =>
+                <Route key={path} path={path} element={<ProductsManager/>}/>)}
+           <Route path={'*'} element={<ErrorPage/>}/>
+        </Routes>
     )
 }
 
