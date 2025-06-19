@@ -1,12 +1,6 @@
 export interface Item {
     title: string
     path: string
+    icon: React.ElementType
 }
 
-// export interface Product {
-//     id: number
-//     name: string,
-//     category: string,
-//     quantity: number,
-//     price: number
-// }
