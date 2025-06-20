@@ -28,26 +28,26 @@ const AddProduct = () => {
     }
 
     return (
-        <form className={"text-alt-text-color"} onSubmit={addProduct}>
-            <h2 className={'text-alt-text-color'}>Add new product:</h2>
+        <form className={"text-base-form"} onSubmit={addProduct}>
+            <h2 className={'text-base-form'}>Add new product:</h2>
             {/*TODO change to components    */}
-            <label className={"text-base-text-color"}>Name:
+            <label className={"text-base-text"}>Name:
                 <input type={"text"} id={"name"} required={true} value={nameProduct} onChange={(e) => setName(e.target.value)}
-                       className={"border-light-green border-2 text-base-text-color"}></input>
+                       className={"border-base-form border-2 text-base-text focus:border-alt-text"}></input>
             </label>
-            <label className={"text-base-text-color"}>Category:
+            <label className={"text-base-form"}>Category:
                 <input type={"text"} id={"category"} required={true} value={category} onChange={(e) => setCategory(e.target.value)}
-                       className={"border-light-green border-2 text-base-text-color"}></input>
+                       className={"border-base-form border-2 text-base-text focus:border-alt-text"}></input>
             </label>
-            <label className={"text-base-text-color"}>Quantity:
+            <label className={"text-base-form"}>Quantity:
                 <input type={"number"} id={"qty"} value={qty == 0? "": qty} min={0} onChange={(e) => setQty(Number(e.target.value))}
-                       className={"border-light-green border-2 text-base-text-color"}></input>
+                       className={"border-base-form border-2 text-base-text focus:border-alt-text"}></input>
             </label>
             <label className={"text-base-text-color"}>Price:
                 <input type={"number"} step={"0.01"} id={"price"} value={price == 0? "" : price} min={0} onChange={(e) => setPrice(Number(e.target.value))}
-                       className={"border-light-green border-2 text-base-text-color"}></input>
+                       className={"border-base-form border-2 text-base-text-color focus:border-alt-text"}></input>
             </label>
-            <button type={"submit"} className={"bg-[#405443] text-[#9dbfab] w-20 border-2 hover:bg-[#57805bff]"}>Add</button>
+            <button type={"submit"} className={"bg-base-form text-light-green w-20 border-2 hover:bg-[#57805bff]"}>Add</button>
         </form>
     )
 }

@@ -76,3 +76,31 @@ export const removeProductFromTable = async (id: string) => {
     return await response.json();
 
 }
+
+export const updateProduct = async (product: Product) => {
+    const URL = `${BASE_URL}/update/${product.id}`;
+
+    const headers = new Headers();
+    headers.append("Content-type", "application/json");
+
+    const raw = JSON.stringify({
+        name: product.name,
+        category: product.category,
+        quantity: product.quantity,
+        price: product.price
+    });
+
+    const options = {
+        method: "PUT",
+        headers: headers,
+        body: raw
+    }
+
+    const response = await fetch(URL, options);
+    if (!response.ok){
+        console.error(response.statusText);
+        return null;
+    }
+
+    return await response.json();
+}

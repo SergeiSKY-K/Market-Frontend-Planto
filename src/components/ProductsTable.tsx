@@ -8,9 +8,9 @@ const ProductsTable = () => {
 
     return (
 
-        <table className={"text-light-green"}>
+        <table className={"text-base-form"}>
             <caption>List of products</caption>
-            <thead className={"border-y-2 border-base-text-color"}>
+            <thead className={"border-y-2 border-base-text"}>
             {/*    TODO change to fields from class Product*/}
                 <tr>
                     <th>Name</th>
