@@ -10,8 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@imagekit/react": "^5.0.1",
     "@tailwindcss/language-server": "^0.14.23",
-    "@tailwindcss/vite": "^4.1.8",
+    "@tailwindcss/vite": "^4.1.10",
     "dotenv": "^16.5.0",
     "lucide-react": "^0.516.0",
     "react": "^19.1.0",
