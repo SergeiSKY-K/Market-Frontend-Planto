@@ -2,6 +2,7 @@ import {ProductsContext} from "../utils/Context.ts";
 import {useContext, useState} from "react";
 import Product from "./Product.ts";
 import {getProductsTable, removeProductFromTable, updateProduct} from "../features/api/productAction.ts";
+import {SquarePen, Trash2, SquareCheckBig, SquareX} from "lucide-react";
 
 interface PropsProduct {
     product: Product,
@@ -49,42 +50,46 @@ const RowProductsTable = (props: PropsProduct) => {
         setIdEditProduct("");
     }
 
-    const fieldName = <input id={`name_${product.id}`}
-                             className={"border-base-form border-2 text-base-text hover:bg-base-bg"}
+    const fieldName = <input id={`name_${product.id}`} className={"inputFieldTable"}
                              value={nameProduct} onChange={(e) => setName(e.target.value)}/>
-    const fieldCategory = <input id={`category_${product.id}`}
-                             className={"border-base-form border-2 text-base-text hover:bg-base-bg"}
+    const fieldCategory = <input id={`category_${product.id}`} className={"inputFieldTable"}
                              value={category} onChange={(e) => setCategory(e.target.value)}/>
-    const fieldQty = <input id={`qty_${product.id}`} type={"number"} min={0}
-                            className={"border-base-form border-2 text-base-text hover:bg-base-bg"}
+    const fieldQty = <input id={`qty_${product.id}`} type={"number"} min={0} className={"inputFieldTable w-34"}
                             value={qty} onChange={(e) => setQty(Number.parseInt(e.target.value))}/>
-    const fieldPrice = <input id={`price_${product.id}`} type={"number"} size={0.01} min={0}
-                            className={"border-base-form border-2 text-base-text hover:bg-base-bg"}
+    const fieldPrice = <input id={`price_${product.id}`} type={"number"} size={0.01} min={0} className={"inputFieldTable w-14"}
                             value={price} onChange={(e) => setPrice(Number.parseFloat(e.target.value))}/>
-    const fieldDescription = <textarea rows={3} id={`description_${product.id}`}
-                              className={"border-base-form border-2 text-base-text hover:bg-base-bg"}
+    const fieldDescription = <textarea rows={3} id={`description_${product.id}`} className={"inputFieldTable h-16 w-full mt-3"}
                               value={description} onChange={(e) => setDescription(e.target.value)}/>
-
     return (
         <tr className={"hover:bg-light-orange hover:text-alt-text"}>
-            <th className={"w-20 h-20"}><img src={imageUrl? imageUrl : "src/assets/empty-foto.jpg"} alt={product.name} className={"rounded-full"}/></th>
+            <th className={"w-20 h-20"}><img src={imageUrl ? imageUrl : "src/assets/empty-foto.jpg"} alt={product.name}
+                                             className={"rounded-full"}/></th>
             <th className={"pl-2 font-normal w-70"}>{idEditProduct == product.id ? fieldName : product.name}</th>
             <th className={"font-normal w-70"}>{idEditProduct == product.id ? fieldCategory : product.category}</th>
             <th className={"pl-2 w-40"}>{idEditProduct == product.id ? fieldQty : product.quantity}</th>
             <th className={"pl-2 w-20"}>{idEditProduct == product.id ? fieldPrice : product.price}</th>
             <th className={"pl-2 font-normal w-70"}>{idEditProduct == product.id ? fieldDescription : product.description}</th>
-            <th className={"w-5 flex flex-row flex-nowrap justify-around items-center"}>
-                <img src={"./src/assets/edit.jpg"} alt={"Edit"}
-                     className={`w-5 ${idEditProduct == product.id ? 'invisible' : ''}`}
-                     onClick={() => editProduct(product.id)}/>
-                <img src={"./src/assets/delete.jpg"} alt={"Delete"} onClick={() => removeProduct(product.id)}
-                     className={`w-5 ${idEditProduct == product.id ? 'invisible' : ''}`}/>
-                <img src={"./src/assets/save.png"} alt={"Save"}
-                     className={`w-5 ${idEditProduct == product.id ? '' : 'invisible'}`}
-                     onClick={() => saveChanges(product.id)}/>
-                <img src={"./src/assets/cancel.png"} alt={"Cancel"} onClick={() => cancelChanges()}
-                     className={`w-5 ${idEditProduct == product.id ? '' : 'invisible'}`}/>
+            <th className={"pl-2 text-color-base-text"}>
+                <div className={"flex flex-row justify-start space-x-1"}>
+                    <SquarePen onClick={() => editProduct(product.id)} className={`${idEditProduct == product.id ? 'hidden' : ''} cursor-pointer`}/>
+                    <Trash2 onClick={() => removeProduct(product.id)} className={`${idEditProduct == product.id ? 'hidden' : ''} cursor-pointer`}/>
+                    <SquareCheckBig onClick={() => saveChanges(product.id)} className={`${idEditProduct == product.id ? '' : 'hidden'} cursor-pointer`}/>
+                    <SquareX onClick={() => cancelChanges()} className={`${idEditProduct == product.id ? '' : 'hidden'} cursor-pointer`}/>
+                </div>
             </th>
+
+            {/*<th className={"w-5 flex flex-row flex-nowrap justify-around items-center"}>*/}
+            {/*    <img src={"./src/assets/edit.jpg"} alt={"Edit"}*/}
+            {/*         className={`w-5 ${idEditProduct == product.id ? 'invisible' : ''}`}*/}
+            {/*         onClick={() => editProduct(product.id)}/>*/}
+            {/*    <img src={"./src/assets/delete.jpg"} alt={"Delete"} onClick={() => removeProduct(product.id)}*/}
+            {/*         className={`w-5 ${idEditProduct == product.id ? 'invisible' : ''}`}/>*/}
+            {/*    <img src={"./src/assets/save.png"} alt={"Save"}*/}
+            {/*         className={`w-5 ${idEditProduct == product.id ? '' : 'invisible'}`}*/}
+            {/*         onClick={() => saveChanges(product.id)}/>*/}
+            {/*    <img src={"./src/assets/cancel.png"} alt={"Cancel"} onClick={() => cancelChanges()}*/}
+            {/*         className={`w-5 ${idEditProduct == product.id ? '' : 'invisible'}`}/>*/}
+            {/*</th>*/}
         </tr>
     )
 }

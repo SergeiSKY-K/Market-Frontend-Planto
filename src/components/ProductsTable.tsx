@@ -9,7 +9,7 @@ const ProductsTable = () => {
     return (
 
         <table className={"text-base-form"}>
-            <caption>List of products</caption>
+            <caption> <p className={"text-[24px] mt-5 mb-3"}>List of products</p></caption>
             <thead className={"border-y-2 border-base-text"}>
             {/*    TODO change to fields from class Product*/}
             <tr>

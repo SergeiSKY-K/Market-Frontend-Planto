@@ -8,6 +8,48 @@
     --color-base-form: #405443
 }
 
+@layer components {
+    .inputField {
+        border-color: var(--color-base-form);
+        border-width: 2px;
+        color: var(--color-base-text);
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    .inputField:focus {
+        border-color: var(--color-alt-text);
+        outline: none;
+    }
+    .inputFieldTable {
+        border-color: var(--color-base-text);
+        border-width: 1px;
+        border-radius: 3px;
+        color: var(--color-base-text);
+        height: 20px;
+    }
+    .inputFieldTable:focus {
+        border-color: var(--color-alt-text);
+        outline: none;
+    }
+    .inputFieldTable:hover{
+        background-color: var(--color-base-bg);
+    }
+
+    .button {
+        background-color: var(--color-base-form);
+        color: var(--color-light-green);
+        border-width: 2px;
+    }
+    .button:hover {
+        background-color: #57805bff;
+    }
+
+    .label {
+        align-items: center;
+        color: var(--color-base-form)
+    }
+}
+
 @layer base{
     html, body{
         height: 100%;
@@ -17,13 +59,6 @@
     }
     #root{
         height: 100%;
-    }
-    form input{
-        border-width: thick;
-        margin: 0.5em;
-    }
-    form input:focus, textarea:focus{
-        outline: none;
     }
     table{
         margin-bottom: 1em;
