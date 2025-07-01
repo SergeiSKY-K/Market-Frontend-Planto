@@ -1,7 +1,8 @@
 import {useContext, useState} from "react";
 import Product from "./Product.ts";
-import {ProductsContext} from "../utils/Context.ts";
+import {PageContext, ProductsContext} from "../utils/context.ts";
 import {getProductsTable, addProductToTable} from "../features/api/productAction.ts";
+import {EMPTY_PHOTO} from "../utils/constants.ts"
 
 const AddProduct = () => {
 
@@ -14,7 +15,8 @@ const AddProduct = () => {
     const [imageFile, setImage] = useState(EMPTY_FILE);
     const [imageUrl, setImageUrl] = useState("");
     const [description, setDescription] = useState("");
-    const {setProducts} = useContext(ProductsContext);
+    const {setProducts: setProductsData} = useContext(ProductsContext);
+    const {pageNumber} = useContext(PageContext);
 
     const addProduct = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,7 +33,7 @@ const AddProduct = () => {
             setImage(EMPTY_FILE);
             setImageUrl("");
             setDescription("");
-            setProducts(await getProductsTable());
+            setProductsData(await getProductsTable(pageNumber));
         }
     }
 
@@ -87,7 +89,7 @@ const AddProduct = () => {
                 </div>
                 <div>
                     <div className={"flex flex-col justify-start"}>
-                        <img src={imageUrl ? imageUrl : "src/assets/empty-foto.jpg"} alt={"Picture"}
+                        <img src={imageUrl ? imageUrl : EMPTY_PHOTO} alt={"Picture"}
                              className={"mt-1 w-50 h-50 border-base-form border-1"}/>
                         <label
                             className={"flex button items-center justify-center w-50 h-10"}>Download image

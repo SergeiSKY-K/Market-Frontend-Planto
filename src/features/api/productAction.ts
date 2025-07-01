@@ -1,14 +1,42 @@
 import Product from "../../components/Product.ts";
 import {uploadFile} from "./imageAction.ts";
+import Sort from "../../components/Sort.ts";
+import {SIZE_PAGE} from "../../utils/constants.ts";
 
-export const getProductsTable = async () => {
+interface answerTable {
+    content: [];
+    page: {
+        size: number,
+        number: number,
+        totalElements: number,
+        totalPages: number
+    }
+}
+
+export const getProductsTable = async (page: number, sort?: Sort) => {
     const URL = import.meta.env.VITE_BASE_PRODUCT_URL;
     if (!URL){
         throw new Error("URL not found in the settings!");
     }
 
+    if (sort == undefined) {
+        sort = new Sort("NameAsc", "name", 1, "Name (from A to Z)");
+    }
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+        page: page - 1,
+        size: SIZE_PAGE,
+        field: sort.field,
+        direction: sort.direction
+    })
+
     const options = {
-        method: "GET",
+        method: "POST",
+        headers: headers,
+        body: raw
     }
 
     const response = await fetch(URL, options);
@@ -18,10 +46,10 @@ export const getProductsTable = async () => {
 
     const products: Product[] = [];
 
-    const data = await response.json();
-    data.map((p: Product) => products.push(new Product(p.id, p.name, p.category, p.quantity, p.price, p.imageUrl, p.description)));
+    const data = await response.json() as answerTable;
+    data.content.map((p: Product) => products.push(new Product(p.id, p.name, p.category, p.quantity, p.price, p.imageUrl, p.description)));
 
-    return products;
+    return {products: products, pages: data.page.totalPages};
 
 }
 

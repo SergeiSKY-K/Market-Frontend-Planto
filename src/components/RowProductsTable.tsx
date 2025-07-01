@@ -1,8 +1,9 @@
-import {ProductsContext} from "../utils/Context.ts";
+import {PageContext, ProductsContext} from "../utils/context.ts";
 import {useContext, useState} from "react";
 import Product from "./Product.ts";
 import {getProductsTable, removeProductFromTable, updateProduct} from "../features/api/productAction.ts";
 import {SquarePen, Trash2, SquareCheckBig, SquareX} from "lucide-react";
+import {EMPTY_PHOTO} from "../utils/constants.ts";
 
 interface PropsProduct {
     product: Product,
@@ -10,9 +11,10 @@ interface PropsProduct {
 
 const RowProductsTable = (props: PropsProduct) => {
 
-    const {products, setProducts} = useContext(ProductsContext);
-    const [idEditProduct, setIdEditProduct] = useState("");
+    const {products, pages, setProductsData} = useContext(ProductsContext);
+    const {pageNumber, sort} = useContext(PageContext);
 
+    const [idEditProduct, setIdEditProduct] = useState("");
     const [nameProduct, setName] = useState(props.product.name);
     const [category, setCategory] = useState(props.product.category);
     const [qty, setQty] = useState(props.product.quantity);
@@ -33,7 +35,7 @@ const RowProductsTable = (props: PropsProduct) => {
     const removeProduct = async (id: string) => {
         const res = await removeProductFromTable(id);
         if (res){
-            setProducts(await getProductsTable());
+            setProductsData(await getProductsTable(pageNumber, sort));
         }
     }
 
@@ -42,7 +44,7 @@ const RowProductsTable = (props: PropsProduct) => {
         const res = await updateProduct(updProduct);
         setIdEditProduct("");
         if (res) {
-            setProducts(await getProductsTable());
+            setProductsData(await getProductsTable(pageNumber, sort));
         }
     }
 
@@ -50,19 +52,35 @@ const RowProductsTable = (props: PropsProduct) => {
         setIdEditProduct("");
     }
 
+    // TODO - make handlers for press button Enter / Esc
+    // const handleKeyWhenEdit = (e: React.KeyboardEvent<SVGSVGElement>, id: string) => {
+    //     if (e.code != "Enter") {
+    //         return;
+    //     }
+    //     editProduct(id);
+    // }
+    //
+    // const handleKeyWhenSave = (e: React.KeyboardEvent<SVGSVGElement>) => {
+    //     if (e.code != "Enter" || !idEditProduct) {
+    //         alert(e.code)
+    //         return;
+    //     }
+    //     saveChanges(idEditProduct);
+    // }
+
     const fieldName = <input id={`name_${product.id}`} className={"inputFieldTable"}
                              value={nameProduct} onChange={(e) => setName(e.target.value)}/>
     const fieldCategory = <input id={`category_${product.id}`} className={"inputFieldTable"}
                              value={category} onChange={(e) => setCategory(e.target.value)}/>
     const fieldQty = <input id={`qty_${product.id}`} type={"number"} min={0} className={"inputFieldTable w-34"}
                             value={qty} onChange={(e) => setQty(Number.parseInt(e.target.value))}/>
-    const fieldPrice = <input id={`price_${product.id}`} type={"number"} size={0.01} min={0} className={"inputFieldTable w-14"}
+    const fieldPrice = <input id={`price_${product.id}`} type={"number"} step={"0.01"} min={0} className={"inputFieldTable w-14"}
                             value={price} onChange={(e) => setPrice(Number.parseFloat(e.target.value))}/>
     const fieldDescription = <textarea rows={3} id={`description_${product.id}`} className={"inputFieldTable h-16 w-full mt-3"}
                               value={description} onChange={(e) => setDescription(e.target.value)}/>
     return (
         <tr className={"hover:bg-light-orange hover:text-alt-text"}>
-            <th className={"w-20 h-20"}><img src={imageUrl ? imageUrl : "src/assets/empty-foto.jpg"} alt={product.name}
+            <th className={"w-20 h-20 align-top"}><img src={imageUrl ? imageUrl : EMPTY_PHOTO} alt={product.name}
                                              className={"rounded-full"}/></th>
             <th className={"pl-2 font-normal w-70"}>{idEditProduct == product.id ? fieldName : product.name}</th>
             <th className={"font-normal w-70"}>{idEditProduct == product.id ? fieldCategory : product.category}</th>
@@ -78,18 +96,6 @@ const RowProductsTable = (props: PropsProduct) => {
                 </div>
             </th>
 
-            {/*<th className={"w-5 flex flex-row flex-nowrap justify-around items-center"}>*/}
-            {/*    <img src={"./src/assets/edit.jpg"} alt={"Edit"}*/}
-            {/*         className={`w-5 ${idEditProduct == product.id ? 'invisible' : ''}`}*/}
-            {/*         onClick={() => editProduct(product.id)}/>*/}
-            {/*    <img src={"./src/assets/delete.jpg"} alt={"Delete"} onClick={() => removeProduct(product.id)}*/}
-            {/*         className={`w-5 ${idEditProduct == product.id ? 'invisible' : ''}`}/>*/}
-            {/*    <img src={"./src/assets/save.png"} alt={"Save"}*/}
-            {/*         className={`w-5 ${idEditProduct == product.id ? '' : 'invisible'}`}*/}
-            {/*         onClick={() => saveChanges(product.id)}/>*/}
-            {/*    <img src={"./src/assets/cancel.png"} alt={"Cancel"} onClick={() => cancelChanges()}*/}
-            {/*         className={`w-5 ${idEditProduct == product.id ? '' : 'invisible'}`}/>*/}
-            {/*</th>*/}
         </tr>
     )
 }

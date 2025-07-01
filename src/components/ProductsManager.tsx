@@ -1,20 +1,21 @@
-import {useEffect, useState} from "react";
-import Product from "./Product.ts";
+import {useContext, useEffect, useState} from "react";
 import {getProductsTable} from "../features/api/productAction.ts";
-import {ProductsContext} from "../utils/Context.ts";
+import {PageContext, ProductsContext} from "../utils/context.ts";
 import AddProduct from "./AddProduct.tsx";
 import ProductsTable from "./ProductsTable.tsx";
+import type {DataTableProducts} from "../utils/types";
 
 const ProductsManager = () => {
 
-    const [products, setProducts] = useState<Product[]>([]);
+    const [productsData, setProductsData] = useState<DataTableProducts>({products: [], pages: 0});
+    const {pageNumber, sort} = useContext(PageContext);
 
     useEffect(() => {
 
         const getProducts = async () => {
             try{
-                const result = await getProductsTable();
-                setProducts(result)
+                const result = await getProductsTable(pageNumber, sort);
+                setProductsData(result)
             } catch (error) {
                 console.error(error);
             }
@@ -25,9 +26,13 @@ const ProductsManager = () => {
 
     return (
         <div className={"col-span-6"}>
-            <ProductsContext.Provider value={{products, setProducts}}>
-                <AddProduct/>
-                <ProductsTable/>
+            <ProductsContext.Provider value={{
+                products: productsData.products,
+                pages: productsData.pages,
+                setProductsData: setProductsData
+            }}>
+                    <AddProduct/>
+                    <ProductsTable/>
             </ProductsContext.Provider>
         </div>
     )

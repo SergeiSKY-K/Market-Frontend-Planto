@@ -25,7 +25,7 @@
         border-width: 1px;
         border-radius: 3px;
         color: var(--color-base-text);
-        height: 20px;
+        height: 30px;
     }
     .inputFieldTable:focus {
         border-color: var(--color-alt-text);
