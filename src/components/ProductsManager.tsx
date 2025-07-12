@@ -8,13 +8,13 @@ import type {DataTableProducts} from "../utils/types";
 const ProductsManager = () => {
 
     const [productsData, setProductsData] = useState<DataTableProducts>({products: [], pages: 0});
-    const {pageNumber, sort} = useContext(PageContext);
+    const {pageNumber, sort, filters} = useContext(PageContext);
 
     useEffect(() => {
 
         const getProducts = async () => {
             try{
-                const result = await getProductsTable(pageNumber, sort);
+                const result = await getProductsTable(pageNumber, sort, filters);
                 setProductsData(result)
             } catch (error) {
                 console.error(error);
@@ -22,7 +22,7 @@ const ProductsManager = () => {
         }
 
         getProducts();
-    }, [])
+    }, [pageNumber, sort, filters])
 
     return (
         <div className={"col-span-6"}>

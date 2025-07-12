@@ -14,6 +14,7 @@ export interface DataTableProducts{
 
 export interface PageProductsData{
     pageNumber: number;
-    sort: Sort
+    sort: Sort;
+    filters: Filter[]
 }
 

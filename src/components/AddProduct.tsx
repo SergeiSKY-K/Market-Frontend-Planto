@@ -15,8 +15,8 @@ const AddProduct = () => {
     const [imageFile, setImage] = useState(EMPTY_FILE);
     const [imageUrl, setImageUrl] = useState("");
     const [description, setDescription] = useState("");
-    const {setProducts: setProductsData} = useContext(ProductsContext);
-    const {pageNumber} = useContext(PageContext);
+    const {setProductsData: setProductsData} = useContext(ProductsContext);
+    const {pageNumber, sort, filters} = useContext(PageContext);
 
     const addProduct = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -33,7 +33,7 @@ const AddProduct = () => {
             setImage(EMPTY_FILE);
             setImageUrl("");
             setDescription("");
-            setProductsData(await getProductsTable(pageNumber));
+            setProductsData(await getProductsTable(pageNumber, sort, filters));
         }
     }
 
@@ -93,7 +93,7 @@ const AddProduct = () => {
                              className={"mt-1 w-50 h-50 border-base-form border-1"}/>
                         <label
                             className={"flex button items-center justify-center w-50 h-10"}>Download image
-                            <input type={"file"} id={"image"}
+                            <input type={"file"} id={"image"} accept={"image/*"}
                                    onChange={(e) => handleSelectFile(e)}
                                    className={"hidden w-50 h-5"}></input>
                         </label>

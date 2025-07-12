@@ -20,6 +20,7 @@ export const uploadFile = async (imageFile: Blob, imageName: string) => {
     const form = new FormData();
     form.append("file", imageFile);
     form.append("fileName", imageName);
+    form.append("useUniqueFileName", "false");
 
     const options = {
         method: "POST",

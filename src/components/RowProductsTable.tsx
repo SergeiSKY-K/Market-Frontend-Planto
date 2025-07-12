@@ -1,5 +1,5 @@
 import {PageContext, ProductsContext} from "../utils/context.ts";
-import {useContext, useState} from "react";
+import {useContext, useRef, useState} from "react";
 import Product from "./Product.ts";
 import {getProductsTable, removeProductFromTable, updateProduct} from "../features/api/productAction.ts";
 import {SquarePen, Trash2, SquareCheckBig, SquareX} from "lucide-react";
@@ -11,16 +11,18 @@ interface PropsProduct {
 
 const RowProductsTable = (props: PropsProduct) => {
 
-    const {products, pages, setProductsData} = useContext(ProductsContext);
-    const {pageNumber, sort} = useContext(PageContext);
+    const {products, setProductsData} = useContext(ProductsContext);
+    const {pageNumber, sort, filters} = useContext(PageContext);
 
     const [idEditProduct, setIdEditProduct] = useState("");
     const [nameProduct, setName] = useState(props.product.name);
     const [category, setCategory] = useState(props.product.category);
     const [qty, setQty] = useState(props.product.quantity);
     const [price, setPrice] = useState(props.product.price);
+    const [imageFile, setImage] = useState(new File([], "", {type: "image/jpg"}));
     const [imageUrl, setImageUrl] = useState(props.product.imageUrl);
     const [description, setDescription] = useState(props.product.description);
+    const inputFileRef = useRef<HTMLInputElement>(null);
 
     const product = props.product;
 
@@ -35,21 +37,48 @@ const RowProductsTable = (props: PropsProduct) => {
     const removeProduct = async (id: string) => {
         const res = await removeProductFromTable(id);
         if (res){
-            setProductsData(await getProductsTable(pageNumber, sort));
+            setProductsData(await getProductsTable(pageNumber, sort, filters));
         }
     }
 
     const saveChanges = async (id: string) => {
+
         const updProduct = new Product(id, nameProduct, category, qty, price, imageUrl, description);
-        const res = await updateProduct(updProduct);
+        const res = await updateProduct(updProduct, imageFile);
         setIdEditProduct("");
         if (res) {
-            setProductsData(await getProductsTable(pageNumber, sort));
+            setProductsData(await getProductsTable(pageNumber, sort, filters));
         }
     }
 
     const cancelChanges = () => {
         setIdEditProduct("");
+    }
+
+    const handlerClickImage = () => {
+        if (idEditProduct === product.id) {
+            inputFileRef.current!.click();
+        }
+    }
+
+    const handleChangeImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+        e.preventDefault();
+
+        if (!e.target.files
+            || e.target.files.length == 0) {
+            return;
+        }
+        setImage(e.target.files[0]);
+    }
+
+    if (imageFile.size != 0) {
+        const fr = new FileReader();
+        fr.readAsDataURL(imageFile);
+        fr.onloadend = () => {
+            if (fr.result != null) {
+                setImageUrl(fr.result as string);
+            }
+        }
     }
 
     // TODO - make handlers for press button Enter / Esc
@@ -80,8 +109,19 @@ const RowProductsTable = (props: PropsProduct) => {
                               value={description} onChange={(e) => setDescription(e.target.value)}/>
     return (
         <tr className={"hover:bg-light-orange hover:text-alt-text"}>
-            <th className={"w-20 h-20 align-top"}><img src={imageUrl ? imageUrl : EMPTY_PHOTO} alt={product.name}
-                                             className={"rounded-full"}/></th>
+             <th className={"w-20 h-20 align-top overflow-hidden"}><img
+                                                          src={imageUrl ? imageUrl : EMPTY_PHOTO} alt={product.name}
+                                                          className={"rounded-full border-base-form border-1 my-0.5"}
+                                                          onClick={handlerClickImage}
+                                                          style={{width: "100%", height: "100%", objectFit: "cover"}}/>
+                 {/*TODO use this in the table for customers*/}
+                 {/*<Image urlEndpoint={`${import.meta.env.VITE_IMAGEKIT_ENDPOINT}`}*/}
+                 {/*       src={imageUrl ? imageUrl : import.meta.env.VITE_IMAGEKIT_EMPTY_PHOTO} alt={product.name}*/}
+                 {/*       className={"rounded-full"}*/}
+                 {/*       onClick={handlerClickImage}*/}
+                 {/*       style={{width: "100%", height: "100%", objectFit: "contain"}}/>                 */}
+                 <input type={"file"} accept={"image/*"} hidden={true} ref={inputFileRef} onChange={(e) => handleChangeImage(e)}/>
+             </th>
             <th className={"pl-2 font-normal w-70"}>{idEditProduct == product.id ? fieldName : product.name}</th>
             <th className={"font-normal w-70"}>{idEditProduct == product.id ? fieldCategory : product.category}</th>
             <th className={"pl-2 w-40"}>{idEditProduct == product.id ? fieldQty : product.quantity}</th>

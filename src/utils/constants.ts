@@ -1,15 +1,11 @@
 import type {Item} from './types'
 
-import {
-    Home,
-    Package,
-    ShoppingCart,
-    Users,
-    BarChart3,
-    Settings,
-} from "lucide-react";
+import {Home, Package,} from "lucide-react";
 import Sort from "../components/Sort.ts";
 import {directions} from "./enums/directions.ts";
+import emptyPhoto from "../assets/empty-foto.jpg";
+import Filter from "../components/Filter.ts";
+import {filterTypes} from "./enums/filterTypes.ts";
 
 export const navItems: Item[] = [
     {title: 'Main', path: 'main', icon: Home},
@@ -21,9 +17,13 @@ export const DEFAULT_SORT = new Sort("NameAsc","name", directions.Ascending, "Na
 export const paramsOfSorts = [
     DEFAULT_SORT,
     new Sort("NameDesc", "name", directions.Descending, "Name (from Z to A)"),
-    new Sort("PriceAsc","price", directions.Ascending, "Price (from low to high)"),
-    new Sort("PriceDesc","price", directions.Descending, "Price (from high to low)"),
+    new Sort("PriceAsc", "price", directions.Ascending, "Price (from low to high)"),
+    new Sort("PriceDesc", "price", directions.Descending, "Price (from high to low)"),
 ]
 
-import emptyPhoto from "../assets/empty-foto.jpg";
 export const EMPTY_PHOTO = emptyPhoto;
+
+export const FILTER_NAME = new Filter("name", filterTypes.like, "string", "");
+export const FILTER_CATEGORY = new Filter("category", filterTypes.in, "string", undefined, undefined, undefined, []);
+export const FILTER_PRICE = new Filter("price", filterTypes.range, "double",undefined, 0, 0);
+export const DATA_FOR_FILTERS = {maxPrice: 0, categories: []};

@@ -9,10 +9,10 @@ import type {PageProductsData} from "../utils/types";
 
 const Workspace = () => {
 
-    const [pageData, setPage] = useState<PageProductsData>({pageNumber: 1, sort: DEFAULT_SORT});
+    const [pageData, setPage] = useState<PageProductsData>({pageNumber: 1, sort: DEFAULT_SORT, filters: []});
 
     return (
-        <PageContext.Provider value={{pageNumber: pageData.pageNumber, sort: pageData.sort, setPage: setPage}}>
+        <PageContext.Provider value={{pageNumber: pageData.pageNumber, sort: pageData.sort, filters: pageData.filters, setPage: setPage}}>
         <Routes>
             {['/', navItems[0].path, `${navItems[0].path}/`].map(path =>
                 <Route key={path} path={path} element={<Home/>}/>)}
