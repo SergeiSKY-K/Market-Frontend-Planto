@@ -1,6 +1,6 @@
 import {useContext, useState} from "react";
-import {FILTER_NAME} from "../utils/constants.ts";
-import {PageContext} from "../utils/context.ts";
+import {FILTER_NAME} from "../../utils/constants.ts";
+import {PageContext} from "../../utils/context.ts";
 
 export const SearchBar = () => {
 
@@ -9,14 +9,19 @@ export const SearchBar = () => {
     const [strSearch, setSearch] = useState("");
     const [filterName, setFilterName] = useState(FILTER_NAME);
 
-    const handleChangeSearch = async (inputString: string) => {
+    const handleChangeSearch = (inputString: string) => {
         setSearch(inputString);
         if (!inputString) {
-            await handlerClickSearch(inputString);
+            setPageWithSearch(inputString);
         }
     }
 
-    const handlerClickSearch = async (inputString : string) => {
+    const handlerClickSearch = (e: React.MouseEvent<HTMLButtonElement>, inputString : string) => {
+        e.preventDefault();
+        setPageWithSearch(inputString);
+    }
+
+    const setPageWithSearch = (inputString: string) => {
 
         const filterSearch = filterName.getCopy({value: inputString});
 
@@ -34,7 +39,8 @@ export const SearchBar = () => {
         }
 
         setFilterName(filterSearch);
-        setPage((prevState)=> ({...prevState, filters: newFilters}));
+        setPage(prevState=> ({...prevState, filters: newFilters}));
+
     }
 
     return (
@@ -47,7 +53,7 @@ export const SearchBar = () => {
                     placeholder={"Find product by name.."}
                     value={strSearch}
                     onChange={(e) => handleChangeSearch(e.target.value)}/>
-                <button className={"button w-20"} onClick={() => handlerClickSearch(strSearch)}>Search</button>
+                <button className={"button w-20"} onClick={(e) => handlerClickSearch(e, strSearch)}>Search</button>
             </form>
         </>
     )

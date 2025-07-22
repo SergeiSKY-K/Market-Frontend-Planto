@@ -1,4 +1,6 @@
+@import "rc-slider/assets/index.css";
 @import "tailwindcss";
+
 @theme {
     --color-base-bg: #f5eade;
     --color-base-text: #57805b;
@@ -6,6 +8,10 @@
     --color-light-green: #9dbfab;
     --color-light-orange: #eec3a9;
     --color-base-form: #405443
+}
+
+.rc-slider-handle:hover {
+    @apply border-alt-text
 }
 
 @layer components {
@@ -66,7 +72,15 @@
         width: 100em;
         text-align: left;
     }
-}
+    #productQuantity input::-webkit-outer-spin-button,
+    #productQuantity input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    #productQuantity input {
+        -moz-appearance: textfield
+    }
 
+}
 
 

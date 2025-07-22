@@ -1,8 +1,8 @@
-import Product from "../../components/Product.ts";
+import Product from "../../components/classes/Product.ts";
 import {uploadFile} from "./imageAction.ts";
-import Sort from "../../components/Sort.ts";
+import Sort from "../../components/classes/Sort.ts";
 import {DATA_FOR_FILTERS, FILTER_PRICE, SIZE_PAGE} from "../../utils/constants.ts";
-import type Filter from "../../components/Filter.ts";
+import type Filter from "../../components/classes/Filter.ts";
 
 interface answerTable {
     content: [];

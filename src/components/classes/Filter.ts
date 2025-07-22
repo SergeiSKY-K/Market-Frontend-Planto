@@ -1,4 +1,4 @@
-import {filterTypes} from "../utils/enums/filterTypes.ts";
+import {filterTypes} from "../../utils/enums/filterTypes.ts";
 
 export type filterValueType = string | number | null;
 

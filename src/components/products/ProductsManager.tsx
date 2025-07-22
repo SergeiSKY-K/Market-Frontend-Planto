@@ -1,28 +1,32 @@
 import {useContext, useEffect, useState} from "react";
-import {getProductsTable} from "../features/api/productAction.ts";
-import {PageContext, ProductsContext} from "../utils/context.ts";
-import AddProduct from "./AddProduct.tsx";
-import ProductsTable from "./ProductsTable.tsx";
-import type {DataTableProducts} from "../utils/types";
+import {getProductsTable} from "../../features/api/productAction.ts";
+import {PageContext, ProductsContext} from "../../utils/context.ts";
+import AddProduct from "../AddProduct.tsx";
+import ProductsView from "./table/ProductsView.tsx";
+import type {DataTableProducts} from "../../utils/types";
+import {useNavigate} from "react-router";
 
 const ProductsManager = () => {
 
     const [productsData, setProductsData] = useState<DataTableProducts>({products: [], pages: 0});
     const {pageNumber, sort, filters} = useContext(PageContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
 
         const getProducts = async () => {
-            try{
+            try {
                 const result = await getProductsTable(pageNumber, sort, filters);
-                setProductsData(result)
+                setProductsData(result);
             } catch (error) {
-                console.error(error);
+                console.error(error)
+                //navigate('/error', {state: {message: `Can't receive data from database by reason ${error}`}});
             }
         }
 
-        getProducts();
-    }, [pageNumber, sort, filters])
+        getProducts().catch(console.error);
+
+    }, [pageNumber, sort, filters, navigate])
 
     return (
         <div className={"col-span-6"}>
@@ -32,9 +36,10 @@ const ProductsManager = () => {
                 setProductsData: setProductsData
             }}>
                     <AddProduct/>
-                    <ProductsTable/>
+                    <ProductsView/>
             </ProductsContext.Provider>
         </div>
+
     )
 }
 

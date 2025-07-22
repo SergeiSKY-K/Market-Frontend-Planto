@@ -1,5 +1,5 @@
 import {directions} from "./enums/directions.ts";
-import type Sort from "../components/Sort.ts";
+import type Sort from "../components/classes/Sort.ts";
 
 export interface Item {
     title: string

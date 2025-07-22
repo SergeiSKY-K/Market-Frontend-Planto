@@ -1,7 +1,7 @@
-import type {Item} from "../utils/types";
+import type {Item} from "../../utils/types";
 import {NavLink, useNavigate} from "react-router";
 import {useContext} from "react";
-import {PageContext} from "../utils/context.ts";
+import {PageContext} from "../../utils/context.ts";
 
 interface Props {
     item: Item

@@ -1,5 +1,5 @@
 import {useContext, useState} from "react";
-import Product from "./Product.ts";
+import Product from "./classes/Product.ts";
 import {PageContext, ProductsContext} from "../utils/context.ts";
 import {getProductsTable, addProductToTable} from "../features/api/productAction.ts";
 import {EMPTY_PHOTO} from "../utils/constants.ts"
@@ -65,22 +65,22 @@ const AddProduct = () => {
                     <label className={"label flex"}>Name:
                         <input type={"text"} id={"name"} required={true} value={nameProduct}
                                onChange={(e) => setName(e.target.value)}
-                               className={"inputField ml-8 mt-1 w-full"}></input>
+                               className={"inputField ml-8 mt-1 w-full"}/>
                     </label>
                     <label className={"label flex"}>Category:
                         <input type={"text"} id={"category"} required={true} value={category}
                                onChange={(e) => setCategory(e.target.value)}
-                               className={"inputField ml-2.5 w-full"}></input>
+                               className={"inputField ml-2.5 w-full"}/>
                     </label>
                     <label className={"label flex"}>Quantity:
                         <input type={"number"} id={"qty"} value={qty == 0 ? "" : qty} min={0}
                                onChange={(e) => setQty(Number(e.target.value))}
-                               className={"inputField ml-3 w-full"}></input>
+                               className={"inputField ml-3 w-full"}/>
                     </label>
                     <label className={"label flex"}>Price:
                         <input type={"number"} step={"0.01"} id={"price"} value={price == 0 ? "" : price} min={0}
                                onChange={(e) => setPrice(Number(e.target.value))}
-                               className={"inputField ml-9.5 w-full"}></input>
+                               className={"inputField ml-9.5 w-full"}/>
                     </label>
                     <label className={"block text-base-form"}>Description:</label>
                     <textarea rows={5} cols={40} id={"description"} value={description}
@@ -95,7 +95,7 @@ const AddProduct = () => {
                             className={"flex button items-center justify-center w-50 h-10"}>Download image
                             <input type={"file"} id={"image"} accept={"image/*"}
                                    onChange={(e) => handleSelectFile(e)}
-                                   className={"hidden w-50 h-5"}></input>
+                                   className={"hidden w-50 h-5"}/>
                         </label>
                     </div>
                     <button type={"submit"} className={"button w-50 h-10 mt-5"}>

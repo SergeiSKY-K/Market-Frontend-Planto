@@ -1,9 +1,10 @@
-import {PageContext, ProductsContext} from "../utils/context.ts";
+import {PageContext, ProductsContext} from "../../../utils/context.ts";
 import {useContext, useRef, useState} from "react";
-import Product from "./Product.ts";
-import {getProductsTable, removeProductFromTable, updateProduct} from "../features/api/productAction.ts";
+import Product from "../../classes/Product.ts";
+import {getProductsTable, removeProductFromTable, updateProduct} from "../../../features/api/productAction.ts";
 import {SquarePen, Trash2, SquareCheckBig, SquareX} from "lucide-react";
-import {EMPTY_PHOTO} from "../utils/constants.ts";
+import {EMPTY_PHOTO} from "../../../utils/constants.ts";
+import ImagePopup from "../ImagePopup.tsx";
 
 interface PropsProduct {
     product: Product,
@@ -11,21 +12,24 @@ interface PropsProduct {
 
 const RowProductsTable = (props: PropsProduct) => {
 
+    const EMPTY_FILE = new File([], "", {type: "image/jpg"});
+
     const {products, setProductsData} = useContext(ProductsContext);
     const {pageNumber, sort, filters} = useContext(PageContext);
 
+    // TODO try wrapped with HOC
     const [idEditProduct, setIdEditProduct] = useState("");
     const [nameProduct, setName] = useState(props.product.name);
     const [category, setCategory] = useState(props.product.category);
     const [qty, setQty] = useState(props.product.quantity);
     const [price, setPrice] = useState(props.product.price);
-    const [imageFile, setImage] = useState(new File([], "", {type: "image/jpg"}));
+    const [imageFile, setImage] = useState(EMPTY_FILE);
     const [imageUrl, setImageUrl] = useState(props.product.imageUrl);
     const [description, setDescription] = useState(props.product.description);
     const inputFileRef = useRef<HTMLInputElement>(null);
+    const [isOpen, setIsOpen] = useState(false);
 
     const product = props.product;
-
 
     const editProduct = (id: string) => {
         const index = products.findIndex((product) => product.id === id);
@@ -58,6 +62,8 @@ const RowProductsTable = (props: PropsProduct) => {
     const handlerClickImage = () => {
         if (idEditProduct === product.id) {
             inputFileRef.current!.click();
+        } else {
+            setIsOpen(true);
         }
     }
 
@@ -97,23 +103,45 @@ const RowProductsTable = (props: PropsProduct) => {
     //     saveChanges(idEditProduct);
     // }
 
-    const fieldName = <input id={`name_${product.id}`} className={"inputFieldTable"}
-                             value={nameProduct} onChange={(e) => setName(e.target.value)}/>
-    const fieldCategory = <input id={`category_${product.id}`} className={"inputFieldTable"}
-                             value={category} onChange={(e) => setCategory(e.target.value)}/>
-    const fieldQty = <input id={`qty_${product.id}`} type={"number"} min={0} className={"inputFieldTable w-34"}
-                            value={qty} onChange={(e) => setQty(Number.parseInt(e.target.value))}/>
-    const fieldPrice = <input id={`price_${product.id}`} type={"number"} step={"0.01"} min={0} className={"inputFieldTable w-14"}
-                            value={price} onChange={(e) => setPrice(Number.parseFloat(e.target.value))}/>
-    const fieldDescription = <textarea rows={3} id={`description_${product.id}`} className={"inputFieldTable h-16 w-full mt-3"}
-                              value={description} onChange={(e) => setDescription(e.target.value)}/>
+    const fieldName = <input
+                                id={`name_${product.id}`}
+                                className={"inputFieldTable"}
+                                value={nameProduct}
+                                onChange={(e) => setName(e.target.value)}/>
+    const fieldCategory = <input
+                                    id={`category_${product.id}`}
+                                    className={"inputFieldTable"}
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}/>
+    const fieldQty = <input
+                                id={`qty_${product.id}`}
+                                className={"inputFieldTable w-34"}
+                                type={"number"}
+                                min={0}
+                                value={qty}
+                                onChange={(e) => setQty(Number.parseInt(e.target.value))}/>
+    const fieldPrice = <input
+                                    id={`price_${product.id}`}
+                                    className={"inputFieldTable w-14"}
+                                    type={"number"}
+                                    step={"0.01"}
+                                    min={0}
+                                    value={price}
+                                    onChange={(e) => setPrice(Number.parseFloat(e.target.value))}/>
+    const fieldDescription = <textarea
+                                        id={`description_${product.id}`}
+                                        className={"inputFieldTable h-16 w-full mt-3"}
+                                        rows={3}
+                                        value={description}
+                                        onChange={(e) => setDescription(e.target.value)}/>
     return (
         <tr className={"hover:bg-light-orange hover:text-alt-text"}>
-             <th className={"w-20 h-20 align-top overflow-hidden"}><img
+             <th className={`w-20 h-20 align-top overflow-hidden ${idEditProduct == product.id ? 'cursor-pointer' : 'cursor-zoom-in' }`}><img
                                                           src={imageUrl ? imageUrl : EMPTY_PHOTO} alt={product.name}
                                                           className={"rounded-full border-base-form border-1 my-0.5"}
                                                           onClick={handlerClickImage}
                                                           style={{width: "100%", height: "100%", objectFit: "cover"}}/>
+                 <ImagePopup name={product.name} category={product.category} url={imageUrl} isOpen = {isOpen} setIsOpen = {setIsOpen}/>
                  {/*TODO use this in the table for customers*/}
                  {/*<Image urlEndpoint={`${import.meta.env.VITE_IMAGEKIT_ENDPOINT}`}*/}
                  {/*       src={imageUrl ? imageUrl : import.meta.env.VITE_IMAGEKIT_EMPTY_PHOTO} alt={product.name}*/}
