@@ -12,14 +12,18 @@
   "dependencies": {
     "@headlessui/react": "^2.2.4",
     "@imagekit/react": "^5.0.1",
+    "@reduxjs/toolkit": "^2.8.2",
     "@tailwindcss/language-server": "^0.14.23",
     "@tailwindcss/vite": "^4.1.10",
+    "axios": "^1.11.0",
     "dotenv": "^16.5.0",
     "lucide-react": "^0.516.0",
     "rc-slider": "^11.1.8",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router": "^7.6.2"
+    "react-redux": "^9.2.0",
+    "react-router": "^7.6.2",
+    "react-router-dom": "^7.7.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.25.0",
@@ -27,6 +31,8 @@
     "@types/rc-slider": "^9.3.0",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
+    "@types/react-redux": "^7.1.34",
+    "@types/react-router-dom": "^5.3.3",
     "@vitejs/plugin-react": "^4.4.1",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.25.0",
