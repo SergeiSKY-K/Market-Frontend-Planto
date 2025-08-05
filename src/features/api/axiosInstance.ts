@@ -2,10 +2,12 @@ import axios from "axios";
 import { store } from "../../store/store.ts";
 import { setAccessToken } from "../../store/tokenSlice";
 
+
 const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_BASE_API_URL,
     withCredentials: true,
 });
+
 
 axiosInstance.interceptors.request.use((config) => {
     const token = store.getState().token.accessToken;
@@ -15,22 +17,32 @@ axiosInstance.interceptors.request.use((config) => {
     return config;
 });
 
+
 axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
 
-        if ((error.response?.status === 403 || error.response?.status === 401) && !originalRequest._retry) {
+
+        if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
             originalRequest._retry = true;
             try {
-                const refreshResponse = await axiosInstance.get("/auth/refresh", {
-                    withCredentials: true,
-                });
+
+                const refreshResponse = await axios.get(
+                    `${import.meta.env.VITE_BASE_API_URL}/auth/refresh`,
+                    { withCredentials: true }
+                );
 
                 const newAccessToken = refreshResponse.headers["authorization"]?.split(" ")[1];
+
                 if (newAccessToken) {
+
                     store.dispatch(setAccessToken(newAccessToken));
+
+
                     originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+
+
                     return axiosInstance(originalRequest);
                 }
             } catch (refreshError) {

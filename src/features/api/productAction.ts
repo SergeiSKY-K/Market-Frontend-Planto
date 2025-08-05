@@ -32,7 +32,9 @@ export const getProductsTable = async (page: number, sort?: Sort) => {
         direction: sort.direction
     };
 
+
     const { data } = await axiosInstance.post<answerTable>(URL, payload);
+
     const products: Product[] = data.content.map((p: Product) =>
         new Product(p.id, p.name, p.category, p.quantity, p.price, p.imageUrl, p.description)
     );
@@ -42,11 +44,10 @@ export const getProductsTable = async (page: number, sort?: Sort) => {
     return { products, pages: data.page.totalPages };
 };
 
-
 export const addProductToTable = async (product: Product, imageFile: Blob) => {
     const BASE_URL = import.meta.env.VITE_BASE_PRODUCT_URL;
     const imageUrl = imageFile ? await uploadFile(imageFile, product.name) : "";
-    const URL = `${BASE_URL}/create`;
+    const URL = BASE_URL; // endpoint: POST /product
 
     const payload = {
         name: product.name,
@@ -70,7 +71,7 @@ export const removeProductFromTable = async (id: string) => {
 
 export const updateProduct = async (product: Product, imageFile: Blob) => {
     const BASE_URL = import.meta.env.VITE_BASE_PRODUCT_URL;
-    const URL = `${BASE_URL}/update/${product.id}`;
+    const URL = `${BASE_URL}/${product.id}`; // endpoint: PUT /product/{id}
 
     if (imageFile.size !== 0) {
         product.imageUrl = await uploadFile(imageFile, product.name);
