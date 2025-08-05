@@ -1,192 +1,103 @@
 import Product from "../../components/classes/Product.ts";
-import {uploadFile} from "./imageAction.ts";
+import { uploadFile } from "./imageAction.ts";
 import Sort from "../../components/classes/Sort.ts";
-import {DATA_FOR_FILTERS, FILTER_PRICE, SIZE_PAGE} from "../../utils/constants.ts";
-import type Filter from "../../components/classes/Filter.ts";
+import { DATA_FOR_FILTERS, FILTER_PRICE, SIZE_PAGE } from "../../utils/constants.ts";
+import axiosInstance from "./axiosInstance.ts";
 
 interface answerTable {
     content: [];
     page: {
-        size: number,
-        number: number,
-        totalElements: number,
-        totalPages: number
-    }
+        size: number;
+        number: number;
+        totalElements: number;
+        totalPages: number;
+    };
 }
 
 interface DataForFilters {
-    price: number,
+    price: number;
     categories: [];
 }
 
-export const getProductsTable = async (page: number, sort?: Sort, filters?: Filter[]) => {
+export const getProductsTable = async (page: number, sort?: Sort) => {
+    const URL = import.meta.env.VITE_BASE_PRODUCT_URL;
 
-    const withFilters = filters && filters.length > 0;
+    if (!URL) throw new Error("URL not found in the settings!");
+    if (!sort) sort = new Sort("NameAsc", "name", 1, "Name (from A to Z)");
 
-    const URL = import.meta.env.VITE_BASE_PRODUCT_URL; //withFilters? import.meta.env.VITE_BASE_PRODUCT_URL : import.meta.env.VITE_PRODUCT_CRITERIA_URL;
-
-    if (!URL){
-        throw new Error("URL not found in the settings!");
-    }
-
-    if (sort == undefined) {
-        sort = new Sort("NameAsc", "name", 1, "Name (from A to Z)");
-    }
-
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
-
-    const criteria = [];
-    if (withFilters) {
-        for (let i = 0; i < filters.length; i++) {
-            criteria.push(filters[i].getFilterDto());
-        }
-    }
-
-   const raw = JSON.stringify({
+    const payload = {
         page: page - 1,
         size: SIZE_PAGE,
         field: sort.field,
-        direction: sort.direction,
-        criteria: criteria
-    })
+        direction: sort.direction
+    };
 
-    const options = {
-        method: "POST",
-        headers: headers,
-        body: raw
-    }
-
-    const response = await fetch(URL, options);
-    if (!response.ok){
-        throw new Error(response.statusText);
-    }
-
-    const products: Product[] = [];
-
-    const data = await response.json() as answerTable;
-    data.content.map((p: Product) => products.push(new Product(p.id, p.name, p.category, p.quantity, p.price, p.imageUrl, p.description)));
+    const { data } = await axiosInstance.post<answerTable>(URL, payload);
+    const products: Product[] = data.content.map((p: Product) =>
+        new Product(p.id, p.name, p.category, p.quantity, p.price, p.imageUrl, p.description)
+    );
 
     await setDataForFilters();
 
-    return {products: products, pages: data.page.totalPages};
+    return { products, pages: data.page.totalPages };
+};
 
-}
 
 export const addProductToTable = async (product: Product, imageFile: Blob) => {
-
     const BASE_URL = import.meta.env.VITE_BASE_PRODUCT_URL;
-
-    const imageUrl = imageFile? await uploadFile(imageFile, product.name) : "";
-
+    const imageUrl = imageFile ? await uploadFile(imageFile, product.name) : "";
     const URL = `${BASE_URL}/create`;
-    const raw = JSON.stringify({
+
+    const payload = {
         name: product.name,
         category: product.category,
         quantity: product.quantity,
         price: product.price,
-        imageUrl: imageUrl,
-        description: product.description
-    });
-    const headers = new Headers();
-    headers.append("Content-type", "application/json");
+        imageUrl,
+        description: product.description,
+    };
 
-    const options = {
-        method: "POST",
-        headers: headers,
-        body: raw
-    }
-
-    const response = await fetch(URL, options);
-
-    if (!response.ok){
-        console.error(response.statusText);
-        return;
-    }
-
-    const data = await response.json();
-    if (data){
-        return new Product(data.id, data.name, data.category, data.quantity, data.price);
-    }
-
-    return null;
-}
+    const { data } = await axiosInstance.post(URL, payload);
+    return data ? new Product(data.id, data.name, data.category, data.quantity, data.price) : null;
+};
 
 export const removeProductFromTable = async (id: string) => {
     const BASE_URL = import.meta.env.VITE_BASE_PRODUCT_URL;
     const URL = `${BASE_URL}/${id}`;
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
-    const options = {
-        method: "DELETE",
-        headers: headers
-    }
-
-    const response = await fetch(URL, options);
-    if (!response.ok){
-        console.error(response.statusText);
-        return;
-    }
-
-    return await response.json();
-
-}
+    const { data } = await axiosInstance.delete(URL);
+    return data;
+};
 
 export const updateProduct = async (product: Product, imageFile: Blob) => {
     const BASE_URL = import.meta.env.VITE_BASE_PRODUCT_URL;
     const URL = `${BASE_URL}/update/${product.id}`;
 
-    if (imageFile.size != 0) {
+    if (imageFile.size !== 0) {
         product.imageUrl = await uploadFile(imageFile, product.name);
     }
 
-    const headers = new Headers();
-    headers.append("Content-type", "application/json");
-
-    const raw = JSON.stringify({
+    const payload = {
         name: product.name,
         category: product.category,
         quantity: product.quantity,
         price: product.price,
         imageUrl: product.imageUrl,
-        description: product.description
-    });
+        description: product.description,
+    };
 
-    const options = {
-        method: "PUT",
-        headers: headers,
-        body: raw
-    }
-
-    const response = await fetch(URL, options);
-    if (!response.ok){
-        console.error(response.statusText);
-        return null;
-    }
-
-    return await response.json();
-}
+    const { data } = await axiosInstance.put(URL, payload);
+    return data;
+};
 
 export const getDataForFilters = async () => {
-
     const URL = `${import.meta.env.VITE_BASE_PRODUCT_URL}/filterdata`;
-    const options = {
-        method: "GET"
-    }
-    const response = await fetch(URL, options);
-
-    if (!response.ok) {
-        throw new Error(`Server returned answer: ${response.status}`);
-    }
-
-    const result = await response.json() as DataForFilters;
-    return {price : result.price, categories: result.categories};
-}
+    const { data } = await axiosInstance.get<DataForFilters>(URL);
+    return { price: data.price, categories: data.categories };
+};
 
 const setDataForFilters = async () => {
     const dataForFilters = await getDataForFilters();
-
     DATA_FOR_FILTERS.maxPrice = dataForFilters.price;
     DATA_FOR_FILTERS.categories = dataForFilters.categories;
     FILTER_PRICE.valueTo = dataForFilters.price;
-}
+};
