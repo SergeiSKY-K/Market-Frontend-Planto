@@ -1,5 +1,5 @@
 import axios from "axios";
-import { store } from "../../store/store.ts";
+import store from "../../store/store.ts";
 import { setAccessToken } from "../../store/tokenSlice";
 
 
