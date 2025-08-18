@@ -1,34 +1,46 @@
-import {useContext} from "react";
-import {ProductsContext} from "../../../utils/context.ts";
-import RowProductsTable from "./RowProductsTable.tsx";
-import EmptyRowTable from "./EmptyRowTable.tsx";
+// добавьте импорт и тип
+import { Ban } from "lucide-react";
+import { toggleProductStatus } from "../../../features/api/productAction";
 
-const ProductsTable = () => {
+type RowProps = {
+    product: any;
+    onSavedLocal?: (p: any) => void;
+    onDeletedLocal?: () => void;
+    onAddToCart?: () => void;
+    onBlockedLocal?: () => void;    // <— NEW
+    showStatus?: boolean;
+};
 
-    const {products} = useContext(ProductsContext);
+export default function Row({ product, onBlockedLocal, /*...*/ }: RowProps) {
+    // ...
+    const blockProduct = async () => {
+        try {
+            await toggleProductStatus(String(product.id), true);
+            onBlockedLocal?.(); // <— мгновенно убираем строку
+        } catch (e: any) {
+            console.error(e);
+            alert(`Block failed: ${e?.message ?? e}`);
+        }
+    };
 
     return (
-        <table className={"text-base-form gap-4"}>
-            <thead className={"border-y-2 border-base-text"}>
-            {/*    TODO change to fields from class Product*/}
-            <tr>
-                <th className={"pl-2"}>Image</th>
-                <th className={"pl-2"}>Name</th>
-                <th className={"pl-2"}>Category</th>
-                <th className={"pl-2"}>Quantity</th>
-                <th className={"pl-2"}>Price</th>
-                <th className={"pl-2"}>Description</th>
-                <th className={"pl-2"}></th>
-            </tr>
-            </thead>
-            <tbody>
-                {products.length == 0?
-                    <EmptyRowTable msg={"Can't receive data from database"}/> :
-                    products.map(product => <RowProductsTable key={product.id} product={product}/>)}
-            </tbody>
-        </table>
-    )
+        <tr className="align-top">
+            {/* ...другие ячейки... */}
 
+            {/* Actions */}
+            <td className="pl-2 py-2 w-[120px]">
+                <div className="flex items-center gap-2">
+                    {/* ваши edit/delete */}
+                    <button className="action-icon" title="Block" onClick={blockProduct}>
+                        <Ban className="h-4 w-4" />
+                    </button>
+                </div>
+            </td>
+
+            {/* Cart */}
+            <td className="pl-2 py-2 w-[54px]">
+                {/* кнопка корзины */}
+            </td>
+        </tr>
+    );
 }
-
-export default ProductsTable

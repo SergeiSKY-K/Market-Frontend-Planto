@@ -1,37 +1,19 @@
-interface answer {
-    fileId: string,
-    name: string,
-    size: number,
-    filePath: string,
-    url: string,
-    height: number,
-    width: number
-}
+import axiosInstance from "./axiosInstance";
 
-export const uploadFile = async (imageFile: Blob, imageName: string) => {
-
-    const BASE_URL = "https://upload.imagekit.io/api/v1/files/upload";
-    const API_KEY = import.meta.env.VITE_IMAGEKIT_API_KEY;
-    const encodedKey = btoa(`${API_KEY}:`);
-
-    const headers = new Headers();
-    headers.append("Authorization", `Basic ${encodedKey}`);
-
+export const uploadProductImage = async (
+    file: Blob,
+    fileName?: string | number
+): Promise<string> => {
     const form = new FormData();
-    form.append("file", imageFile);
-    form.append("fileName", imageName);
-    form.append("useUniqueFileName", "false");
+    form.append("file", file);
+    if (fileName != null) form.append("fileName", String(fileName));
 
-    const options = {
-        method: "POST",
-        headers: headers,
-        body: form
-    }
+    const { data } = await axiosInstance.post("/files", form, {
+        headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
+    });
 
-    const response = await fetch(BASE_URL, options);
-
-    if (!response.ok){
-        return "";
-    }
-    return (await response.json() as answer).url;
-}
+    if (data?.url) return data.url;
+    if (typeof data === "string") return data;
+    throw new Error("Upload failed: no url in response");
+};

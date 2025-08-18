@@ -41,23 +41,23 @@ const LoginForm = () => {
                 gap: "12px",
             }}
         >
-            <h2 style={{ textAlign: "center" }}>Login</h2>
+            <h2 style={{textAlign: "center"}}>Login</h2>
 
             <input
                 placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                style={{ padding: "10px", borderRadius: "5px", border: "1px solid #aaa" }}
+                style={{padding: "10px", borderRadius: "5px", border: "1px solid #aaa"}}
             />
             <input
                 placeholder="Password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={{ padding: "10px", borderRadius: "5px", border: "1px solid #aaa" }}
+                style={{padding: "10px", borderRadius: "5px", border: "1px solid #aaa"}}
             />
 
-            {error && <div style={{ color: "red", fontSize: "14px" }}>{error}</div>}
+            {error && <div style={{color: "red", fontSize: "14px"}}>{error}</div>}
 
             <button
                 onClick={handleLogin}
@@ -74,6 +74,9 @@ const LoginForm = () => {
             >
                 {loading ? "Logging in..." : "Login"}
             </button>
+            <div className="mt-3 text-sm">
+                Not Registered? <a href="/register" className="text-emerald-700 underline">Register</a>
+            </div>
         </div>
     );
 };

@@ -1,0 +1,1 @@
+export const localDT = (s?: string | null) => (s ? new Date(s).toLocaleString() : '');

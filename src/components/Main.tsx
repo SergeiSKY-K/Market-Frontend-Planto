@@ -1,14 +1,13 @@
-import Navigation from "./navigation/Navigation.tsx";
-import Workspace from "./Workspace.tsx";
+import { Outlet } from "react-router-dom";
+import Navigation from "./navigation/Navigation";
 
-const Main = () => {
+export default function Main() {
     return (
-        <main className={"grid grid-cols-7 gap-4 h-full"}>
-            <Navigation/>
-            <Workspace/>
-        </main>
-    )
+        <div className="app-layout flex min-h-screen">
+            <Navigation />
+            <main className="flex-1 p-6">
+                <Outlet />
+            </main>
+        </div>
+    );
 }
-
-export default Main
-

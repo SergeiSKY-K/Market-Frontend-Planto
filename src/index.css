@@ -2,85 +2,138 @@
 @import "tailwindcss";
 
 @theme {
-    --color-base-bg: #f5eade;
+    --color-base-bg: #ffffff; /* был #f5eade */
     --color-base-text: #57805b;
     --color-alt-text: #cd663d;
     --color-light-green: #9dbfab;
     --color-light-orange: #eec3a9;
-    --color-base-form: #405443
+    --color-base-form: #405443;
 }
 
-.rc-slider-handle:hover {
-    @apply border-alt-text
-}
+.rc-slider-handle:hover { @apply border-alt-text }
 
+/* ---------- components ---------- */
 @layer components {
-    .inputField {
-        border-color: var(--color-base-form);
-        border-width: 2px;
+    /* карточки */
+    .card { @apply bg-white rounded-2xl shadow border p-5; border-color: var(--color-light-green); }
+
+    /* hero (общая обёртка) */
+    .hero{
+        @apply rounded-2xl shadow border p-5;
+        border-color: var(--color-light-green);
+        position: relative;
+        overflow: hidden;
+        background: #fff;
+    }
+    /* hero с фоном */
+    .hero--bg{
+        display: flex; flex-direction: column; justify-content: flex-end; gap: .25rem;
+        color:#fff;
+        background-image:
+                linear-gradient(0deg, rgba(64,84,67,.75), rgba(64,84,67,.35)),
+                url("../public/img/market.jpg"); /* положи картинку в public/img/market.jpg */
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+    /* высота, чтобы фото было видно */
+    .hero--tall{ min-height: 260px; }
+    @media (min-width: 768px){ .hero--tall{ min-height: 320px; } }
+    @media (min-width: 1280px){ .hero--tall{ min-height: 360px; } }
+
+    /* таблица продуктов: аккуратные колонки действий и корзины */
+    .table-products .col-actions { width: 140px; }
+    .table-products .col-cart    { width: 64px; }
+    .table-products td.col-actions > div { justify-content: center; } /* иконки ближе к центру */
+    .table-products td, .table-products th { vertical-align: top; }
+
+    /* маленькие круглые зелёные кнопки-иконки */
+    .action-icon{
+        @apply inline-flex items-center justify-center rounded-md transition-colors;
+        width: 34px; height: 34px;
+        border: 1px solid var(--color-base-text);
         color: var(--color-base-text);
-        margin-top: 5px;
-        margin-bottom: 5px;
+        background: transparent;
     }
-    .inputField:focus {
-        border-color: var(--color-alt-text);
-        outline: none;
-    }
-    .inputFieldTable {
-        border-color: var(--color-base-text);
-        border-width: 1px;
-        border-radius: 3px;
-        color: var(--color-base-text);
-        height: 30px;
-    }
-    .inputFieldTable:focus {
-        border-color: var(--color-alt-text);
-        outline: none;
-    }
-    .inputFieldTable:hover{
-        background-color: var(--color-base-bg);
+    .action-icon:hover{
+        color: var(--color-alt-text);
+        background: linear-gradient(90deg, rgba(238,195,169,.35), rgba(238,195,169,.15));
     }
 
-    .button {
+    .action-btn{
+        @apply inline-flex items-center justify-center p-2 rounded-md transition-colors;
+        border: 1px solid var(--color-base-text);
+        color: var(--color-base-text);
+    }
+    .action-btn:hover{
+        color: var(--color-alt-text);
+        background: linear-gradient(90deg, rgba(238,195,169,.35), rgba(238,195,169,.15));
+    }
+    .action-btn:disabled{ opacity:.4; pointer-events:none; }
+
+    /* сайдбар */
+    .sidebar{
+        @apply w-60 min-h-screen px-4 py-6 rounded-r-2xl shadow flex flex-col justify-between;
         background-color: var(--color-base-form);
         color: var(--color-light-green);
-        border-width: 2px;
     }
-    .button:hover {
-        background-color: #57805bff;
+    .side-icon { @apply h-5 w-5; }
+
+    /* бейдж корзины */
+    .badge{
+        @apply ml-2 inline-flex items-center justify-center px-2 text-xs font-semibold rounded;
+        background: var(--color-alt-text);
+        color: #fff;
     }
 
-    .label {
-        align-items: center;
-        color: var(--color-base-form)
+    .logout{
+        @apply mt-6 w-full flex items-center justify-center gap-2 rounded-xl py-2 font-medium transition-colors;
+        background-color: #d21f3c; color:#fff;
     }
+    .logout:hover{ background-color:#b61a34; }
+
+    .side-link {
+        @apply flex items-center gap-2 px-3 py-2 rounded-lg transition-colors cursor-pointer;
+        @apply text-[var(--color-light-green)];
+    }
+    .side-link:hover {
+        background: linear-gradient(90deg, rgba(238,195,169,.25), rgba(238,195,169,.10));
+        color: var(--color-alt-text);
+    }
+    .side-link--active {
+        background: linear-gradient(90deg, rgba(238,195,169,.55), rgba(238,195,169,.20));
+        color: var(--color-alt-text);
+        @apply font-medium;
+    }
+
+    .nav-label { @apply mt-4 mb-1 text-xs uppercase tracking-wide opacity-70; color: var(--color-light-green); }
+
+    .inputField { border-color: var(--color-base-form); border-width: 2px; color: var(--color-base-text); margin-top:5px; margin-bottom:5px; }
+    .inputField:focus { border-color: var(--color-alt-text); outline: none; }
+
+    .inputFieldTable { border-color: var(--color-base-text); border-width: 1px; border-radius: 3px; color: var(--color-base-text); height: 30px; }
+    .inputFieldTable:focus { border-color: var(--color-alt-text); outline: none; }
+    .inputFieldTable:hover{ background-color: var(--color-base-bg); }
+
+    .button { background-color: var(--color-base-form); color: var(--color-light-green); border-width: 2px; }
+    .button:hover { background-color: #57805bff; }
+
+    .label { align-items: center; color: var(--color-base-form); }
 }
 
+/* ---------- base ---------- */
 @layer base{
-    html, body{
-        height: 100%;
-    }
-    body{
-        background-color: #f5eade;
-    }
-    #root{
-        height: 100%;
-    }
+    html, body{ height: 100%; }
+    body { background-color: var(--color-base-bg); }
+    #root{ height: 100%; }
+
     table{
-        margin-bottom: 1em;
-        margin-top: 1em;
-        width: 100em;
-        text-align: left;
+        margin-bottom: 1em; margin-top: 1em;
+        width: 100%; max-width: 100%;
+        table-layout: auto; text-align: left;
     }
+
     #productQuantity input::-webkit-outer-spin-button,
-    #productQuantity input::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-    #productQuantity input {
-        -moz-appearance: textfield
-    }
-
+    #productQuantity input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    #productQuantity input { -moz-appearance: textfield; }
 }
-
-

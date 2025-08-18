@@ -1,41 +1,115 @@
-import { navItems } from "../../utils/constants.ts";
-import NavItem from "./NavItem.tsx";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../../features/api/logout.ts";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../../store/store";
+import { clearAccessToken } from "../../store/tokenSlice";
+import { getRolesFromJwt } from "../../utils/jwt";
+import { selectCartCount } from "../../store/cartSlice";
 
-const Navigation = () => {
+import {
+    Home, Boxes, User, ShoppingCart, PackageSearch, Users, Shield, LogOut,
+} from "lucide-react";
+
+export default function Navigation() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const login = useSelector((state: RootState) => state.token.accessToken); // или state.user?.login если есть user
 
-    const handleLogout = async () => {
-        try {
-            if (!login) return;
+    const token = useSelector((s: RootState) => s.token.accessToken);
+    const roles = token ? getRolesFromJwt(token) : [];
+    const cartCount = useSelector(selectCartCount);
 
-            await logout(dispatch, login); // login — строка, например, "admin"
-            navigate("/login");
-        } catch (e) {
-            console.error("Logout error", e);
-        }
+    const onLogout = () => {
+        dispatch(clearAccessToken());
+        navigate("/login");
     };
 
-    return (
-        <nav className={"col-span-1 bg-base-form h-full py-10 px-3"}>
-            <ul>
-                {navItems.map(item => <NavItem key={item.path} item={item} />)}
-                <li className="mt-6">
-                    <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                    >
-                        Logout
-                    </button>
-                </li>
-            </ul>
-        </nav>
-    );
-};
+    const linkClass = ({ isActive }: { isActive: boolean }) =>
+        "side-link " + (isActive ? "side-link--active" : "");
 
-export default Navigation;
+    const isSupplier = roles.includes("SUPPLIER") || roles.includes("ADMINISTRATOR");
+    const isModerator = roles.includes("MODERATOR");
+    const isAdminOrMod = roles.includes("ADMINISTRATOR") || roles.includes("MODERATOR");
+    const isAdmin = roles.includes("ADMINISTRATOR");
+
+    return (
+        <aside className="sidebar">
+            <nav className="flex flex-col gap-1">
+                <NavLink to="/" end className={linkClass}>
+                    <Home className="side-icon" />
+                    <span>Main</span>
+                </NavLink>
+
+                <NavLink to="/products" className={linkClass}>
+                    <Boxes className="side-icon" />
+                    <span>Products</span>
+                </NavLink>
+
+                <NavLink to="/profile" className={linkClass}>
+                    <User className="side-icon" />
+                    <span>Profile</span>
+                </NavLink>
+
+                <NavLink to="/cart" className={linkClass}>
+                    <ShoppingCart className="side-icon" />
+                    <span>Cart</span>
+                    {cartCount > 0 && <span className="badge">{cartCount}</span>}
+                </NavLink>
+
+                <div className="nav-label">Orders</div>
+
+                <NavLink to="/orders" className={linkClass}>
+                    <PackageSearch className="side-icon" />
+                    <span>My orders</span>
+                </NavLink>
+
+                {isSupplier && (
+                    <NavLink to="/supplier/orders" className={linkClass}>
+                        <PackageSearch className="side-icon" />
+                        <span>Supplier orders</span>
+                    </NavLink>
+                )}
+
+                {isModerator && (
+                    <NavLink to="/moderator/orders" className={linkClass}>
+                        <Shield className="side-icon" />
+                        <span>Moderator orders</span>
+                    </NavLink>
+                )}
+
+                {/* НОВОЕ — страница «Мои товары» */}
+                {isSupplier && (
+                    <NavLink to="/supplier/my-products" className={linkClass}>
+                        <Boxes className="side-icon" />
+                        <span>My products</span>
+                    </NavLink>
+                )}
+
+                {/* НОВОЕ — страница «Black list» */}
+                {isAdminOrMod && (
+                    <NavLink to="/moderator/blacklist" className={linkClass}>
+                        <Shield className="side-icon" />
+                        <span>Black list</span>
+                    </NavLink>
+                )}
+
+                {isAdminOrMod && (
+                    <NavLink to="/suppliers" className={linkClass}>
+                        <Users className="side-icon" />
+                        <span>Suppliers</span>
+                    </NavLink>
+                )}
+
+                {isAdmin && (
+                    <NavLink to="/admin/users" className={linkClass}>
+                        <Users className="side-icon" />
+                        <span>Users</span>
+                    </NavLink>
+                )}
+            </nav>
+
+            <button className="logout" onClick={onLogout}>
+                <LogOut className="h-5 w-5" />
+                <span>Logout</span>
+            </button>
+        </aside>
+    );
+}

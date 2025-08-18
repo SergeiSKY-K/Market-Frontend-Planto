@@ -1,11 +1,12 @@
-import {directions} from "./enums/directions.ts";
+import type { ComponentType } from "react";
 import type Sort from "../components/classes/Sort.ts";
 
 export interface Item {
-    title: string
-    path: string
-    icon: React.ElementType
+    title: string;
+    path: string;               // всегда абсолютный, с '/'
+    icon: ComponentType<any>;   // lucide icon компонент
 }
+
 
 export interface DataTableProducts{
     products: Product[],
