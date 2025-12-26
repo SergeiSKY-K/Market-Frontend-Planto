@@ -7,11 +7,7 @@ import { addToCart } from "../../../store/cartSlice";
 import type { Product } from "../../../types/Product";
 
 export default function ProductsView() {
-    const ctx = useContext(ProductsContext);
-    if (!ctx) return null;
-
-    const { products, setProductsData } = ctx;
-    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { products, setProductsData } = useContext(ProductsContext);
     const dispatch = useDispatch();
 
     const [sp, setSp] = useSearchParams();
@@ -27,9 +23,7 @@ export default function ProductsView() {
             if (cat) s.add(cat);
         }
         const list = Array.from(s).sort((a, b) => a.localeCompare(b));
-        if (currentCategory && !list.includes(currentCategory)) {
-            list.unshift(currentCategory);
-        }
+        if (currentCategory && !list.includes(currentCategory)) list.unshift(currentCategory);
         return list;
     }, [products, currentCategory]);
 
@@ -66,6 +60,7 @@ export default function ProductsView() {
                         <option key={c} value={c}>{c}</option>
                     ))}
                 </select>
+
                 {currentCategory && (
                     <button className="action-btn" onClick={() => setCategoryParam("")}>
                         Reset
@@ -86,6 +81,7 @@ export default function ProductsView() {
                     <th>Cart</th>
                 </tr>
                 </thead>
+
                 <tbody>
                 {products.map((p) => (
                     <RowProductsTable
@@ -94,9 +90,7 @@ export default function ProductsView() {
                         onSavedLocal={(np: Product) =>
                             setProductsData((prev) => ({
                                 ...prev,
-                                products: prev.products.map((x) =>
-                                    x.id === np.id ? np : x
-                                ),
+                                products: prev.products.map((x) => (x.id === np.id ? np : x)),
                             }))
                         }
                         onDeletedLocal={() =>

@@ -1,6 +1,7 @@
-import React, {type Dispatch, type SetStateAction } from "react";
-import type {Product} from "../types/Product";
+import React, { type Dispatch, type SetStateAction } from "react";
+import type { Product } from "../types/Product";
 import type { DataTableProducts, PageProductsData } from "./types";
+import { DEFAULT_SORT } from "./constants";
 import type Sort from "../components/classes/Sort";
 import type Filter from "../components/classes/Filter";
 
@@ -17,8 +18,16 @@ interface PageContextType {
     setPage: Dispatch<SetStateAction<PageProductsData>>;
 }
 
-export const ProductsContext =
-    React.createContext<ContextData | null>(null);
 
-export const PageContext =
-    React.createContext<PageContextType | null>(null);
+export const ProductsContext = React.createContext<ContextData>({
+    products: [],
+    pages: 0,
+    setProductsData: () => {},
+});
+
+export const PageContext = React.createContext<PageContextType>({
+    pageNumber: 1,
+    sort: DEFAULT_SORT,
+    filters: [],
+    setPage: () => {},
+});
