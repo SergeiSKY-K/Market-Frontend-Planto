@@ -21,8 +21,8 @@ export default function ProductsView() {
     const [sp, setSp] = useSearchParams();
     const currentCategory = sp.get("category") ?? "";
 
-    const safeProducts = useMemo(() => {
-        return (products as unknown as ProductLike[]) ?? [];
+    const safeProducts = useMemo<ProductLike[]>(() => {
+        return Array.isArray(products) ? products : [];
     }, [products]);
 
     const categories = useMemo(() => {
