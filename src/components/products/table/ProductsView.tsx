@@ -7,7 +7,10 @@ import { addToCart } from "../../../store/cartSlice";
 import type { Product } from "../../../types/Product";
 
 export default function ProductsView() {
-    const { products, setProductsData } = useContext(ProductsContext);
+    const ctx = useContext(ProductsContext);
+    if (!ctx) return null;
+
+    const { products, setProductsData } = ctx;
     const dispatch = useDispatch();
 
     const [sp, setSp] = useSearchParams();
@@ -15,13 +18,12 @@ export default function ProductsView() {
 
     const categories = useMemo(() => {
         const s = new Set<string>();
+
         for (const p of products) {
-            const cat =
-                typeof p.category === "string"
-                    ? p.category
-                    : p.category?.name ?? "";
+            const cat = (p.category ?? "").trim();
             if (cat) s.add(cat);
         }
+
         const list = Array.from(s).sort((a, b) => a.localeCompare(b));
         if (currentCategory && !list.includes(currentCategory)) list.unshift(currentCategory);
         return list;
@@ -35,12 +37,15 @@ export default function ProductsView() {
     };
 
     const handleAddToCart = (p: Product) => {
+        // supplierLogin у Product может не быть -> безопасно читаем как any
+        const anyP = p as any;
+
         dispatch(
             addToCart({
                 id: String(p.id),
                 name: p.name,
                 price: Number(p.price) || 0,
-                supplierLogin: p.supplierLogin ?? p.supplier?.login ?? "",
+                supplierLogin: anyP?.supplierLogin ?? anyP?.supplier?.login ?? "",
                 qty: 1,
             })
         );
@@ -57,7 +62,9 @@ export default function ProductsView() {
                 >
                     <option value="">All categories</option>
                     {categories.map((c) => (
-                        <option key={c} value={c}>{c}</option>
+                        <option key={c} value={c}>
+                            {c}
+                        </option>
                     ))}
                 </select>
 
@@ -86,8 +93,8 @@ export default function ProductsView() {
                 {products.map((p) => (
                     <RowProductsTable
                         key={p.id}
-                        product={p}
-                        onSavedLocal={(np: Product) =>
+                        product={p as any}
+                        onSavedLocal={(np: any) =>
                             setProductsData((prev) => ({
                                 ...prev,
                                 products: prev.products.map((x) => (x.id === np.id ? np : x)),
