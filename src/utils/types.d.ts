@@ -6,7 +6,7 @@ import type { ComponentType } from "react";
 export interface Item {
     title: string;
     path: string;
-    icon: ComponentType<never>;
+    icon: ComponentType<any>;
 }
 
 export interface DataTableProducts {

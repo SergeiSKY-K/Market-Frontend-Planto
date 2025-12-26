@@ -4,7 +4,15 @@ import { useSearchParams } from "react-router-dom";
 import { ProductsContext } from "../../../utils/context";
 import RowProductsTable from "./RowProductsTable";
 import { addToCart } from "../../../store/cartSlice";
-import type { Product } from "../../../types/Product";
+
+type ProductLike = {
+    id: string | number;
+    name: string;
+    category?: string;
+    price?: number;
+    supplierLogin?: string;
+    supplier?: { login?: string };
+};
 
 export default function ProductsView() {
     const ctx = useContext(ProductsContext);
@@ -19,8 +27,8 @@ export default function ProductsView() {
     const categories = useMemo(() => {
         const s = new Set<string>();
 
-        for (const p of products) {
-            const cat = (p.category ?? "").trim();
+        for (const p of products as unknown as ProductLike[]) {
+            const cat = String(p.category ?? "").trim();
             if (cat) s.add(cat);
         }
 
@@ -36,16 +44,13 @@ export default function ProductsView() {
         setSp(next, { replace: true });
     };
 
-    const handleAddToCart = (p: Product) => {
-        // supplierLogin у Product может не быть -> безопасно читаем как any
-        const anyP = p as any;
-
+    const handleAddToCart = (p: ProductLike) => {
         dispatch(
             addToCart({
                 id: String(p.id),
                 name: p.name,
                 price: Number(p.price) || 0,
-                supplierLogin: anyP?.supplierLogin ?? anyP?.supplier?.login ?? "",
+                supplierLogin: p.supplierLogin ?? p.supplier?.login ?? "",
                 qty: 1,
             })
         );
@@ -55,6 +60,7 @@ export default function ProductsView() {
         <div className="overflow-x-auto">
             <div className="mb-3 flex items-center gap-3">
                 <label className="opacity-70">Filter by category:</label>
+
                 <select
                     className="inputField w-56"
                     value={currentCategory}
@@ -90,26 +96,26 @@ export default function ProductsView() {
                 </thead>
 
                 <tbody>
-                {products.map((p) => (
+                {(products as unknown as ProductLike[]).map((p) => (
                     <RowProductsTable
-                        key={p.id}
+                        key={String(p.id)}
                         product={p as any}
                         onSavedLocal={(np: any) =>
-                            setProductsData((prev) => ({
+                            setProductsData((prev: any) => ({
                                 ...prev,
-                                products: prev.products.map((x) => (x.id === np.id ? np : x)),
+                                products: prev.products.map((x: any) => (x.id === np.id ? np : x)),
                             }))
                         }
                         onDeletedLocal={() =>
-                            setProductsData((prev) => ({
+                            setProductsData((prev: any) => ({
                                 ...prev,
-                                products: prev.products.filter((x) => x.id !== p.id),
+                                products: prev.products.filter((x: any) => x.id !== p.id),
                             }))
                         }
                         onBlockedLocal={() =>
-                            setProductsData((prev) => ({
+                            setProductsData((prev: any) => ({
                                 ...prev,
-                                products: prev.products.filter((x) => x.id !== p.id),
+                                products: prev.products.filter((x: any) => x.id !== p.id),
                             }))
                         }
                         onAddToCart={() => handleAddToCart(p)}
