@@ -1,4 +1,3 @@
-// src/utils/jwt.ts
 export const getSubFromJwt = (token?: string): string | null => {
     if (!token) return null;
     const parts = token.split(".");

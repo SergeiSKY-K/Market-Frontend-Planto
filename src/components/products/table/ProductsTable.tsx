@@ -1,4 +1,3 @@
-// добавьте импорт и тип
 import { Ban } from "lucide-react";
 import { toggleProductStatus } from "../../../features/api/productAction";
 
@@ -7,7 +6,7 @@ type RowProps = {
     onSavedLocal?: (p: any) => void;
     onDeletedLocal?: () => void;
     onAddToCart?: () => void;
-    onBlockedLocal?: () => void;    // <— NEW
+    onBlockedLocal?: () => void;
     showStatus?: boolean;
 };
 
@@ -16,7 +15,7 @@ export default function Row({ product, onBlockedLocal, /*...*/ }: RowProps) {
     const blockProduct = async () => {
         try {
             await toggleProductStatus(String(product.id), true);
-            onBlockedLocal?.(); // <— мгновенно убираем строку
+            onBlockedLocal?.();
         } catch (e: any) {
             console.error(e);
             alert(`Block failed: ${e?.message ?? e}`);

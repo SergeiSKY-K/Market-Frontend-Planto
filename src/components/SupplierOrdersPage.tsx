@@ -10,28 +10,28 @@ export default function SupplierOrdersPage() {
     const dispatch = useAppDispatch();
     const { supplier, loading } = useAppSelector((s) => s.orders);
 
-    // фильтры / сортировки
-    const [q, setQ] = useState("");                       // текстовый поиск: id / buyer
-    const [status, setStatus] = useState("");             // статус (если есть в объекте)
-    const [from, setFrom] = useState<string>("");         // yyyy-mm-dd
-    const [to, setTo] = useState<string>("");             // yyyy-mm-dd
-    const [min, setMin] = useState<string>("");           // минимум Total
-    const [max, setMax] = useState<string>("");           // максимум Total
+
+    const [q, setQ] = useState("");
+    const [status, setStatus] = useState("");
+    const [from, setFrom] = useState<string>("");
+    const [to, setTo] = useState<string>("");
+    const [min, setMin] = useState<string>("");
+    const [max, setMax] = useState<string>("");
     const [sort, setSort] = useState<SortKey>("date_desc");
 
-    // загрузка
+
     const load = () => dispatch(thunkFetchSupplier());
     useEffect(() => { load(); }, []); // при монтировании
 
-    // применённое представление
+
     const view = useMemo(() => {
         let rows = supplier.map((o: any) => ({
             ...o,
             _total: Number(o.totalPrice ?? 0),
-            _status: o.status ?? "", // может отсутствовать на бэке
+            _status: o.status ?? "",
         }));
 
-        // поиск по id / userLogin
+
         const needle = q.trim().toLowerCase();
         if (needle) {
             rows = rows.filter(
@@ -41,10 +41,10 @@ export default function SupplierOrdersPage() {
             );
         }
 
-        // фильтр по статусу (если поле есть)
+
         if (status) rows = rows.filter((o) => o._status === status);
 
-        // диапазон дат
+
         if (from) {
             const ts = new Date(from + "T00:00:00").getTime();
             rows = rows.filter((o) => new Date(o.createdAt).getTime() >= ts);
@@ -54,11 +54,11 @@ export default function SupplierOrdersPage() {
             rows = rows.filter((o) => new Date(o.createdAt).getTime() <= ts);
         }
 
-        // диапазон total
+
         if (min !== "") rows = rows.filter((o) => o._total >= Number(min));
         if (max !== "") rows = rows.filter((o) => o._total <= Number(max));
 
-        // сортировка
+
         rows.sort((a, b) => {
             switch (sort) {
                 case "date_asc":
@@ -96,7 +96,7 @@ export default function SupplierOrdersPage() {
                 </button>
             </div>
 
-            {/* Панель фильтров */}
+
             <div className="card">
                 <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                     <div>

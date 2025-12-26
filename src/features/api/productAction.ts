@@ -1,7 +1,7 @@
 import axiosInstance from "./axiosInstance";
-import { uploadProductImage } from "./imageAction";
+import { uploadFile } from "./fileApi.ts";
 
-const BASE_URL = import.meta.env.VITE_BASE_PRODUCT_URL || "/product";
+const BASE_URL = "/products";
 
 export const getProductsTable = async (_p = 1, _s?: unknown, _f?: unknown) => {
     const { data } = await axiosInstance.get(BASE_URL);
@@ -16,6 +16,7 @@ type CreatePayload = {
     price: number;
     description?: string;
     imageUrl?: string;
+    fileId?: string;
 };
 
 export const addProductToTable = async (
@@ -23,10 +24,13 @@ export const addProductToTable = async (
     imageFile?: Blob
 ) => {
     let imageUrl: string | undefined;
+    let fileId: string | undefined;
 
     if (imageFile && imageFile.size > 0) {
         try {
-            imageUrl = await uploadProductImage(imageFile, product.name);
+            const up = await uploadFile(imageFile, product.name);
+            imageUrl = up.url;
+            fileId = up.fileId;
         } catch (e) {
             console.warn("Image upload failed, continue without image", e);
         }
@@ -39,21 +43,48 @@ export const addProductToTable = async (
         price: Number(product.price) || 0,
         description: product.description?.trim() ?? "",
         ...(imageUrl ? { imageUrl } : {}),
+        ...(fileId ? { fileId } : {}),
     };
 
     const { data } = await axiosInstance.post(BASE_URL, payload);
     return data;
 };
 
-export const updateProduct = async (p: any) => {
-    const payload = {
+type UpdateArgs = {
+    id: string | number;
+    name?: string;
+    category?: string | { name?: string };
+    quantity?: number;
+    price?: number;
+    description?: string;
+    imageUrl?: string;
+    newImageFile?: File | Blob | null;
+    newImageFileName?: string | number;
+};
+
+export const updateProduct = async (p: UpdateArgs) => {
+    let imageUrl = p.imageUrl ?? undefined;
+    let fileId: string | undefined;
+
+    if (p.newImageFile) {
+        const up = await uploadFile(
+            p.newImageFile,
+            p.newImageFileName ?? p.id ?? "product"
+        );
+        imageUrl = up.url;
+        fileId = up.fileId;
+    }
+
+    const payload: any = {
         name: p.name?.trim(),
         category: typeof p.category === "string" ? p.category : p.category?.name,
-        quantity: Number(p.quantity) || 0,
-        price: Number(p.price) || 0,
-        description: p.description ?? "",
-        imageUrl: p.imageUrl ?? undefined,
+        quantity: typeof p.quantity === "number" ? p.quantity : undefined,
+        price: typeof p.price === "number" ? p.price : undefined,
+        description: p.description ?? undefined,
+        imageUrl,
+        ...(fileId ? { fileId } : {}),
     };
+
     const { data } = await axiosInstance.put(`${BASE_URL}/${p.id}`, payload);
     return data;
 };

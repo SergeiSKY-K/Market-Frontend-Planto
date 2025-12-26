@@ -2,7 +2,7 @@
 @import "tailwindcss";
 
 @theme {
-    --color-base-bg: #ffffff; /* был #f5eade */
+    --color-base-bg: #ffffff;
     --color-base-text: #57805b;
     --color-alt-text: #cd663d;
     --color-light-green: #9dbfab;
@@ -12,12 +12,12 @@
 
 .rc-slider-handle:hover { @apply border-alt-text }
 
-/* ---------- components ---------- */
+
 @layer components {
-    /* карточки */
+
     .card { @apply bg-white rounded-2xl shadow border p-5; border-color: var(--color-light-green); }
 
-    /* hero (общая обёртка) */
+
     .hero{
         @apply rounded-2xl shadow border p-5;
         border-color: var(--color-light-green);
@@ -25,7 +25,7 @@
         overflow: hidden;
         background: #fff;
     }
-    /* hero с фоном */
+
     .hero--bg{
         display: flex; flex-direction: column; justify-content: flex-end; gap: .25rem;
         color:#fff;
@@ -36,18 +36,18 @@
         background-position: center;
         background-repeat: no-repeat;
     }
-    /* высота, чтобы фото было видно */
+
     .hero--tall{ min-height: 260px; }
     @media (min-width: 768px){ .hero--tall{ min-height: 320px; } }
     @media (min-width: 1280px){ .hero--tall{ min-height: 360px; } }
 
-    /* таблица продуктов: аккуратные колонки действий и корзины */
+
     .table-products .col-actions { width: 140px; }
     .table-products .col-cart    { width: 64px; }
-    .table-products td.col-actions > div { justify-content: center; } /* иконки ближе к центру */
+    .table-products td.col-actions > div { justify-content: center; }
     .table-products td, .table-products th { vertical-align: top; }
 
-    /* маленькие круглые зелёные кнопки-иконки */
+
     .action-icon{
         @apply inline-flex items-center justify-center rounded-md transition-colors;
         width: 34px; height: 34px;
@@ -71,7 +71,7 @@
     }
     .action-btn:disabled{ opacity:.4; pointer-events:none; }
 
-    /* сайдбар */
+
     .sidebar{
         @apply w-60 min-h-screen px-4 py-6 rounded-r-2xl shadow flex flex-col justify-between;
         background-color: var(--color-base-form);
@@ -79,7 +79,7 @@
     }
     .side-icon { @apply h-5 w-5; }
 
-    /* бейдж корзины */
+
     .badge{
         @apply ml-2 inline-flex items-center justify-center px-2 text-xs font-semibold rounded;
         background: var(--color-alt-text);
@@ -121,7 +121,7 @@
     .label { align-items: center; color: var(--color-base-form); }
 }
 
-/* ---------- base ---------- */
+
 @layer base{
     html, body{ height: 100%; }
     body { background-color: var(--color-base-bg); }

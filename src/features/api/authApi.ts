@@ -4,7 +4,7 @@ import { setUser } from "../../store/userSlice";
 import type { AppDispatch } from "../../store/store";
 
 interface LoginDto {
-    username: string;
+    login: string;
     password: string;
 }
 
@@ -26,11 +26,10 @@ export const login = async (credentials: LoginDto, dispatch: AppDispatch) => {
     const userDto = response.data as { login: string; roles?: string[] };
     dispatch(setUser({ login: userDto.login, roles: userDto.roles || [] }));
 
-    return userDto; // можно использовать дальше в UI
+    return userDto;
 };
 
 export const register = async (body: RegisterBody) => {
-    // Бэк отдаёт UserDto без авторизации — логиниться после регистрации отдельно
     const { data } = await axiosInstance.post("/users/register", body);
     return data; // UserDto
 };

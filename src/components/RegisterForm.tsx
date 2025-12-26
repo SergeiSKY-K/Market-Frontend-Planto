@@ -1,4 +1,3 @@
-// src/components/RegisterForm.tsx
 import { useState } from "react";
 import { register } from "../features/api/authApi.ts";
 import { useNavigate, Link } from "react-router-dom";

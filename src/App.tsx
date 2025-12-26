@@ -1,4 +1,9 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import axios from "axios";
+
+import { setAccessToken } from "./store/tokenSlice";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainWithContext from "./components/MainWithContext";
 
@@ -15,19 +20,59 @@ import MyOrdersPage from "./components/MyOrdersPage";
 import SupplierOrdersPage from "./components/SupplierOrdersPage";
 import ModeratorOrdersPage from "./components/ModeratorOrdersPage";
 import CartPage from "./components/CartPage";
-
-// НОВОЕ
 import SupplierProductsPage from "./components/SupplierProductsPage";
 import ModeratorBlockedPage from "./components/ModeratorBlockedPage";
 
+const API = import.meta.env.VITE_BASE_API_URL;
+
 export default function App() {
+    const dispatch = useDispatch();
+    const location = useLocation();
+    const [bootstrapped, setBootstrapped] = useState(false);
+
+    useEffect(() => {
+        const isAuthPage =
+            location.pathname === "/login" ||
+            location.pathname === "/register";
+
+        if (isAuthPage) {
+            setBootstrapped(true);
+            return;
+        }
+
+        const bootstrapAuth = async () => {
+            try {
+                const resp = await axios.post(
+                    `${API}/auth/refresh`,
+                    null,
+                    { withCredentials: true }
+                );
+
+                const accessToken = resp.data?.accessToken;
+                if (accessToken) {
+                    dispatch(setAccessToken(accessToken));
+                }
+            } catch {
+                // не залогинен — ок
+            } finally {
+                setBootstrapped(true);
+            }
+        };
+
+        bootstrapAuth();
+    }, [dispatch, location.pathname]);
+
+    if (!bootstrapped) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <Routes>
-            {/* public */}
+
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
 
-            {/* layout + nested */}
+
             <Route
                 path="/*"
                 element={
@@ -40,12 +85,10 @@ export default function App() {
                 <Route path="products" element={<ProductsManager />} />
                 <Route path="products/:pageNumber" element={<ProductsManager />} />
                 <Route path="profile" element={<ProfilePage />} />
-
-                {/* cart */}
                 <Route path="cart" element={<CartPage />} />
 
-                {/* orders */}
                 <Route path="orders" element={<MyOrdersPage />} />
+
                 <Route
                     path="supplier/orders"
                     element={
@@ -54,6 +97,7 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
+
                 <Route
                     path="moderator/orders"
                     element={
@@ -71,6 +115,7 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
+
                 <Route
                     path="admin/users"
                     element={
@@ -80,7 +125,6 @@ export default function App() {
                     }
                 />
 
-                {/* НОВОЕ */}
                 <Route
                     path="supplier/my-products"
                     element={
@@ -89,6 +133,7 @@ export default function App() {
                         </ProtectedRoute>
                     }
                 />
+
                 <Route
                     path="moderator/blacklist"
                     element={
@@ -98,11 +143,9 @@ export default function App() {
                     }
                 />
 
-                {/* nested 404 */}
                 <Route path="*" element={<ErrorPage msg="Page not found" />} />
             </Route>
 
-            {/* fallback 404 */}
             <Route path="*" element={<ErrorPage msg="Page not found" />} />
         </Routes>
     );

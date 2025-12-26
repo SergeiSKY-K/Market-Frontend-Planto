@@ -3,8 +3,8 @@ import type Sort from "../components/classes/Sort.ts";
 
 export interface Item {
     title: string;
-    path: string;               // всегда абсолютный, с '/'
-    icon: ComponentType<any>;   // lucide icon компонент
+    path: string;
+    icon: ComponentType<any>;
 }
 
 

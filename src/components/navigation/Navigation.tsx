@@ -1,12 +1,13 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "../../store/store";
-import { clearAccessToken } from "../../store/tokenSlice";
+import { logout } from "../../features/api/logout";
 import { getRolesFromJwt } from "../../utils/jwt";
 import { selectCartCount } from "../../store/cartSlice";
 
 import {
-    Home, Boxes, User, ShoppingCart, PackageSearch, Users, Shield, LogOut,
+    Home, Boxes, User, ShoppingCart, PackageSearch,
+    Users, Shield, LogOut,
 } from "lucide-react";
 
 export default function Navigation() {
@@ -17,9 +18,9 @@ export default function Navigation() {
     const roles = token ? getRolesFromJwt(token) : [];
     const cartCount = useSelector(selectCartCount);
 
-    const onLogout = () => {
-        dispatch(clearAccessToken());
-        navigate("/login");
+    const onLogout = async () => {
+        await logout(dispatch);
+        navigate("/login", { replace: true });
     };
 
     const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -75,7 +76,6 @@ export default function Navigation() {
                     </NavLink>
                 )}
 
-                {/* НОВОЕ — страница «Мои товары» */}
                 {isSupplier && (
                     <NavLink to="/supplier/my-products" className={linkClass}>
                         <Boxes className="side-icon" />
@@ -83,7 +83,6 @@ export default function Navigation() {
                     </NavLink>
                 )}
 
-                {/* НОВОЕ — страница «Black list» */}
                 {isAdminOrMod && (
                     <NavLink to="/moderator/blacklist" className={linkClass}>
                         <Shield className="side-icon" />

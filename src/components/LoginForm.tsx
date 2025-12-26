@@ -16,7 +16,7 @@ const LoginForm = () => {
         setLoading(true);
         setError("");
         try {
-            await login({ username, password }, dispatch);
+            await login({ login: username, password }, dispatch);
             navigate("/products");
         } catch (err: any) {
             setError("Login failed. Please check your credentials.");

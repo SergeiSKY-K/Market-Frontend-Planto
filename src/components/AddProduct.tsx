@@ -41,7 +41,6 @@ const AddProduct = () => {
             imageFile.size > 0 ? imageFile : undefined
         );
 
-        // очистка формы
         setName("");
         setCategory("");
         setPrice(0);
@@ -50,7 +49,7 @@ const AddProduct = () => {
         setImageUrl("");
         setDescription("");
 
-        // перезагружаем список
+
         const updated = await getProductsTable(pageNumber, sort, filters);
         setProductsData(updated);
     };

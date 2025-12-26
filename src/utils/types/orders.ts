@@ -1,4 +1,4 @@
-// types/orders.ts
+
 export type OrderStatus = 'CREATED' | 'PAID' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
 
 export interface OrderItemDto {
@@ -12,10 +12,10 @@ export interface OrderItemDto {
 export interface OrderResponseDto {
     id: string;
     userLogin: string;
-    items: OrderItemDto[]; // если придет null — нормализуем на []
+    items: OrderItemDto[];
     status: OrderStatus;
     totalPrice: number;
-    createdAt: string; // ISO
+    createdAt: string;
     paidAt?: string | null;
 }
 

@@ -1,4 +1,3 @@
-// src/components/navigation/NavItem.tsx
 import type { Item } from "../../utils/types";
 import { NavLink, useNavigate } from "react-router-dom"; // <-- было "react-router"
 import { useContext } from "react";

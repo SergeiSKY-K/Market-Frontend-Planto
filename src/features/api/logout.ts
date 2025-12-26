@@ -1,19 +1,13 @@
-// src/features/api/logout.ts
 import axiosInstance from "../api/axiosInstance";
 import { clearAccessToken } from "../../store/tokenSlice";
 import { clearUser } from "../../store/userSlice";
 import type { AppDispatch } from "../../store/store";
 
-export const logout = async (dispatch: AppDispatch, login?: string) => {
+export const logout = async (dispatch: AppDispatch) => {
     try {
-        // если login передали — отправим как раньше, нет — просто скипаем параметр
-        await axiosInstance.post(
-            `/auth/logout`,
-            null,
-            login ? { params: { login } } : undefined
-        );
+        await axiosInstance.post("/auth/logout");
     } catch (e) {
-        console.error("Logout failed (ignored):", e);
+        console.warn("Logout request failed (ignored)");
     } finally {
         dispatch(clearAccessToken());
         dispatch(clearUser());

@@ -7,7 +7,7 @@ export default function Main() {
         <div className="grid grid-cols-7 gap-4 min-h-screen">
             <Navigation />
             <div className="col-span-6 p-6">
-                <Outlet /> {/* сюда подставляются страницы */}
+                <Outlet />
             </div>
         </div>
     );

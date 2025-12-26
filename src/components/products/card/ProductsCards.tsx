@@ -23,7 +23,6 @@ export default function ProductsCards() {
     const dispatch = useDispatch();
 
     return (
-        // авто-адаптивная сетка — без горизонтального скролла
         <div className="grid gap-5 mt-4 grid-cols-[repeat(auto-fit,minmax(280px,1fr))]">
             {products.map((p) => {
                 const category =
@@ -36,7 +35,6 @@ export default function ProductsCards() {
                         key={String(p.id)}
                         className="rounded-xl border border-[var(--color-base-text)] bg-[var(--color-base-bg)]/60 shadow-sm overflow-hidden"
                     >
-                        {/* Картинка КРУПНЕЕ */}
                         {img ? (
                             <img src={img} alt={p.name} className="w-full h-64 object-cover" />
                         ) : (

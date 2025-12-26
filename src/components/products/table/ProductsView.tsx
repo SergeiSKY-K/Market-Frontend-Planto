@@ -4,9 +4,14 @@ import { useSearchParams } from "react-router-dom";
 import { ProductsContext } from "../../../utils/context";
 import RowProductsTable from "./RowProductsTable";
 import { addToCart } from "../../../store/cartSlice";
+import type { Product } from "../../../types/Product";
 
 export default function ProductsView() {
-    const { products, setProductsData } = useContext(ProductsContext);
+    const ctx = useContext(ProductsContext);
+    if (!ctx) return null;
+
+    const { products, setProductsData } = ctx;
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const dispatch = useDispatch();
 
     const [sp, setSp] = useSearchParams();
@@ -16,12 +21,15 @@ export default function ProductsView() {
         const s = new Set<string>();
         for (const p of products) {
             const cat =
-                typeof p.category === "string" ? p.category : (p.category?.name ?? "");
+                typeof p.category === "string"
+                    ? p.category
+                    : p.category?.name ?? "";
             if (cat) s.add(cat);
         }
         const list = Array.from(s).sort((a, b) => a.localeCompare(b));
-        // если в URL есть категория, которой нет в текущем списке — всё равно покажем её в селекте
-        if (currentCategory && !list.includes(currentCategory)) list.unshift(currentCategory);
+        if (currentCategory && !list.includes(currentCategory)) {
+            list.unshift(currentCategory);
+        }
         return list;
     }, [products, currentCategory]);
 
@@ -32,7 +40,7 @@ export default function ProductsView() {
         setSp(next, { replace: true });
     };
 
-    const handleAddToCart = (p: any) => {
+    const handleAddToCart = (p: Product) => {
         dispatch(
             addToCart({
                 id: String(p.id),
@@ -42,12 +50,10 @@ export default function ProductsView() {
                 qty: 1,
             })
         );
-        console.log("add-to-cart", p.id);
     };
 
     return (
         <div className="overflow-x-auto">
-            {/* панель фильтров (только категория — по задаче) */}
             <div className="mb-3 flex items-center gap-3">
                 <label className="opacity-70">Filter by category:</label>
                 <select
@@ -70,39 +76,39 @@ export default function ProductsView() {
             <table className="w-full table-auto">
                 <thead className="border-y-2 border-base-text">
                 <tr>
-                    <th className="pl-2">Image</th>
-                    <th className="pl-2">Name</th>
-                    <th className="pl-2">Category</th>
-                    <th className="pl-2">Quantity</th>
-                    <th className="pl-2">Price</th>
-                    <th className="pl-2 hidden xl:table-cell">Description</th>
-                    <th className="pl-2 w-[150px] text-center">Actions</th>
-                    <th className="pl-2 w-[64px] text-center">Cart</th>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th className="hidden xl:table-cell">Description</th>
+                    <th>Actions</th>
+                    <th>Cart</th>
                 </tr>
                 </thead>
                 <tbody>
-                {products.map((p: any) => (
+                {products.map((p) => (
                     <RowProductsTable
                         key={p.id}
                         product={p}
-                        onSavedLocal={(np) =>
-                            setProductsData((prev: any) => ({
+                        onSavedLocal={(np: Product) =>
+                            setProductsData((prev) => ({
                                 ...prev,
-                                products: prev.products.map((x: any) =>
+                                products: prev.products.map((x) =>
                                     x.id === np.id ? np : x
                                 ),
                             }))
                         }
                         onDeletedLocal={() =>
-                            setProductsData((prev: any) => ({
+                            setProductsData((prev) => ({
                                 ...prev,
-                                products: prev.products.filter((x: any) => x.id !== p.id),
+                                products: prev.products.filter((x) => x.id !== p.id),
                             }))
                         }
                         onBlockedLocal={() =>
-                            setProductsData((prev: any) => ({
+                            setProductsData((prev) => ({
                                 ...prev,
-                                products: prev.products.filter((x: any) => x.id !== p.id),
+                                products: prev.products.filter((x) => x.id !== p.id),
                             }))
                         }
                         onAddToCart={() => handleAddToCart(p)}

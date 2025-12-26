@@ -10,7 +10,6 @@ export default function Home() {
 
     return (
         <div className="p-6 space-y-6">
-            {/* единственный hero с фото на фоне */}
             <div className="hero hero--bg hero--tall">
                 <h1 className="text-3xl font-semibold leading-tight">Dashboards</h1>
                 <p className="opacity-90">Quick actions & helpful links.</p>

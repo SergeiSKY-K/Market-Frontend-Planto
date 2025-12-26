@@ -1,6 +1,6 @@
 import axiosInstance from "./axiosInstance";
 
-/** Роли и тип пользователя */
+
 export type AppRole =
     | "ADMINISTRATOR"
     | "MODERATOR"
@@ -17,7 +17,7 @@ export type AppUser = {
     createdAt?: string;
 };
 
-/** Self / общий */
+
 export const getUserByLogin = async (login: string): Promise<AppUser> =>
     (await axiosInstance.get(`/users/user/${encodeURIComponent(login)}`)).data;
 

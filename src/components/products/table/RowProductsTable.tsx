@@ -5,7 +5,6 @@ import { getRolesFromJwt } from "../../../utils/jwt";
 
 import { PencilLine, Trash2, ShoppingCart, Check, X, ImagePlus, Ban } from "lucide-react";
 import { updateProduct, deleteProduct, toggleProductStatus } from "../../../features/api/productAction";
-import { uploadProductImage } from "../../../features/api/imageAction";
 
 type AnyProduct = {
     id: string | number;
@@ -23,7 +22,7 @@ type Props = {
     onSavedLocal?: (p: AnyProduct) => void;
     onDeletedLocal?: () => void;
     onAddToCart?: () => void;
-    onBlockedLocal?: () => void;  // ← для мгновенного удаления строки после block
+    onBlockedLocal?: () => void;
     showStatus?: boolean;
 };
 
@@ -34,9 +33,8 @@ export default function RowProductsTable({
                                              onAddToCart,
                                              onBlockedLocal,
                                          }: Props) {
-    // роли → модератор/админ могут блокировать
-    const token   = useSelector((s: RootState) => s.token.accessToken);
-    const roles   = token ? getRolesFromJwt(token) : [];
+    const token = useSelector((s: RootState) => s.token.accessToken);
+    const roles = token ? getRolesFromJwt(token) : [];
     const canModerate = roles.includes("MODERATOR") || roles.includes("ADMINISTRATOR");
 
     const initialImg = product.imageUrl ?? product.image ?? product.photoUrl ?? "";
@@ -76,26 +74,28 @@ export default function RowProductsTable({
     const save = async () => {
         setSaving(true);
         try {
-            // 0) если есть новый файл — загрузим, получим url
-            let finalImageUrl = initialImg;
-            if (file) {
-                const url = await uploadProductImage(file, product.id);
-                if (url) finalImageUrl = url;
-            }
+            const updated = await updateProduct({
+                id: product.id,
+                name: name.trim(),
+                price,
+                quantity: qty,
+                description: desc?.trim() ?? "",
+                imageUrl: file ? undefined : imgPreview,         // если файл не меняли — оставим текущий url
+                newImageFile: file ?? undefined,                  // если есть новый файл — загрузим
+                newImageFileName: product.id,                     // понятное имя в сторе
+                category: product.category,                       // как и было
+            });
 
-            // 1) PUT
-            const payload: AnyProduct = {
+            // если бэк возвращает актуальный объект — лучше его отдать наверх
+            onSavedLocal?.(updated ?? {
                 ...product,
                 name: name.trim(),
                 price,
                 quantity: qty,
                 description: desc?.trim() ?? "",
-                imageUrl: finalImageUrl,
-            };
-            await updateProduct(payload);
+                imageUrl: updated?.imageUrl ?? (file ? imgPreview : initialImg),
+            });
 
-            // 2) локально заменить строку
-            onSavedLocal?.(payload);
             setEdit(false);
             setFile(null);
         } catch (e: any) {
@@ -123,7 +123,7 @@ export default function RowProductsTable({
     const blockProduct = async () => {
         try {
             await toggleProductStatus(String(product.id), true);
-            onBlockedLocal?.(); // мгновенно убираем строку из таблицы
+            onBlockedLocal?.();
         } catch (e: any) {
             console.error(e);
             alert(`Block failed: ${e?.message ?? e}`);
@@ -132,7 +132,6 @@ export default function RowProductsTable({
 
     return (
         <tr className="align-top">
-            {/* Image */}
             <td className="pl-2 py-2">
                 <div className="flex items-center gap-2">
                     {imgPreview
@@ -147,38 +146,32 @@ export default function RowProductsTable({
                 </div>
             </td>
 
-            {/* Name */}
             <td className="pl-2 py-2">
                 {edit
                     ? <input className="inputFieldTable w-full" value={name} onChange={(e) => setName(e.target.value)} />
                     : product.name}
             </td>
 
-            {/* Category */}
             <td className="pl-2 py-2">{categoryText}</td>
 
-            {/* Quantity */}
             <td className="pl-2 py-2">
                 {edit
                     ? <input type="number" className="inputFieldTable w-24" value={qty} onChange={(e) => setQty(Number(e.target.value) || 0)} />
                     : (product.quantity ?? 0)}
             </td>
 
-            {/* Price */}
             <td className="pl-2 py-2">
                 {edit
                     ? <input type="number" className="inputFieldTable w-24" value={price} onChange={(e) => setPrice(Number(e.target.value) || 0)} />
                     : (Number(product.price) || 0)}
             </td>
 
-            {/* Description (скрываем на узких экранах) */}
             <td className="pl-2 py-2 hidden xl:table-cell">
                 {edit
-                    ? <input className="inputFieldTable w-full" value={desc} onChange={(e) => setDesc(e.target.value)} />
+                    ? <input className="inputFieldTable w/full" value={desc} onChange={(e) => setDesc(e.target.value)} />
                     : (product.description ?? "")}
             </td>
 
-            {/* Actions — фикс ширина и центр */}
             <td className="pl-2 py-2 w-[150px] text-center">
                 <div className="flex items-center justify-center gap-2">
                     {edit ? (
@@ -208,7 +201,6 @@ export default function RowProductsTable({
                 </div>
             </td>
 
-            {/* Cart — фикс ширина и центр */}
             <td className="pl-2 py-2 w-[64px] text-center">
                 <button
                     className="action-icon"

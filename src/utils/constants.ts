@@ -1,4 +1,3 @@
-// src/utils/constants.ts
 import type { Item } from "./types";
 import { Home, Package, Shield, User, Users } from "lucide-react";
 import Sort from "../components/classes/Sort";
@@ -8,19 +7,19 @@ import Filter from "../components/classes/Filter";
 import { filterTypes } from "./enums/filterTypes";
 import type { Dispatch, SetStateAction } from "react";
 
-// базовое меню (для любого залогиненного)
+
 export const baseNavItems: Item[] = [
-    { title: "Main",     path: "",         icon: Home },     // "" => "/"
+    { title: "Main",     path: "",         icon: Home },
     { title: "Products", path: "products", icon: Package },
     { title: "Profile",  path: "profile",  icon: User },
 ];
 
-// только модератор/админ
+
 export const modOnlyItems: Item[] = [
     { title: "Suppliers", path: "suppliers", icon: Users },
 ];
 
-// только админ
+
 export const adminOnlyItems: Item[] = [
     { title: "Users", path: "admin/users", icon: Shield },
 ];
