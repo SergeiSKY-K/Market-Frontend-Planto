@@ -4,7 +4,15 @@ import { useSearchParams } from "react-router-dom";
 import { ProductsContext } from "../../../utils/context";
 import RowProductsTable from "./RowProductsTable";
 import { addToCart } from "../../../store/cartSlice";
-import type { Product } from "../../../utils/types/Product.ts";
+
+type ProductLike = {
+    id: string | number;
+    name: string;
+    category?: unknown;
+    price?: number;
+    supplierLogin?: string;
+    supplier?: { login?: string };
+};
 
 export default function ProductsView() {
     const { products, setProductsData } = useContext(ProductsContext);
@@ -13,23 +21,28 @@ export default function ProductsView() {
     const [sp, setSp] = useSearchParams();
     const currentCategory = sp.get("category") ?? "";
 
+    const safeProducts = useMemo(() => {
+        return (products as unknown as ProductLike[]) ?? [];
+    }, [products]);
+
     const categories = useMemo(() => {
         const s = new Set<string>();
 
-        for (const p of products) {
+        for (const p of safeProducts) {
+            const raw = (p as any)?.category;
             const cat =
-                typeof p.category === "string"
-                    ? p.category
-                    : p.category?.name ?? "";
-            if (cat) s.add(cat);
+                typeof raw === "string"
+                    ? raw
+                    : (raw?.name ?? "");
+
+            const clean = String(cat).trim();
+            if (clean) s.add(clean);
         }
 
         const list = Array.from(s).sort((a, b) => a.localeCompare(b));
-        if (currentCategory && !list.includes(currentCategory)) {
-            list.unshift(currentCategory);
-        }
+        if (currentCategory && !list.includes(currentCategory)) list.unshift(currentCategory);
         return list;
-    }, [products, currentCategory]);
+    }, [safeProducts, currentCategory]);
 
     const setCategoryParam = (v: string) => {
         const next = new URLSearchParams(sp);
@@ -38,13 +51,14 @@ export default function ProductsView() {
         setSp(next, { replace: true });
     };
 
-    const handleAddToCart = (p: Product) => {
+    const handleAddToCart = (p: ProductLike) => {
         dispatch(
             addToCart({
-                id: p.id,
-                name: p.name,
-                price: Number(p.price) || 0,
-                supplierLogin: p.supplierLogin ?? p.supplier?.login ?? "",
+                id: String(p.id),
+                name: String(p.name ?? ""),
+                price: Number((p as any)?.price) || 0,
+                supplierLogin:
+                    (p as any)?.supplierLogin ?? (p as any)?.supplier?.login ?? "",
                 qty: 1,
             })
         );
@@ -62,7 +76,9 @@ export default function ProductsView() {
                 >
                     <option value="">All categories</option>
                     {categories.map((c) => (
-                        <option key={c} value={c}>{c}</option>
+                        <option key={c} value={c}>
+                            {c}
+                        </option>
                     ))}
                 </select>
 
@@ -84,11 +100,29 @@ export default function ProductsView() {
                 </thead>
 
                 <tbody>
-                {products.map((p) => (
+                {safeProducts.map((p) => (
                     <RowProductsTable
-                        key={p.id}
-                        product={p}
+                        key={String(p.id)}
+                        product={p as any}
                         onAddToCart={() => handleAddToCart(p)}
+                        onSavedLocal={(np: any) =>
+                            setProductsData((prev: any) => ({
+                                ...prev,
+                                products: prev.products.map((x: any) => (x.id === np.id ? np : x)),
+                            }))
+                        }
+                        onDeletedLocal={() =>
+                            setProductsData((prev: any) => ({
+                                ...prev,
+                                products: prev.products.filter((x: any) => x.id !== p.id),
+                            }))
+                        }
+                        onBlockedLocal={() =>
+                            setProductsData((prev: any) => ({
+                                ...prev,
+                                products: prev.products.filter((x: any) => x.id !== p.id),
+                            }))
+                        }
                     />
                 ))}
                 </tbody>
