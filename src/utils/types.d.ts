@@ -1,21 +1,14 @@
-import type { ComponentType } from "react";
-import type Sort from "../components/classes/Sort.ts";
+import type { Product } from "../types/Product";
+import type Sort from "../components/classes/Sort";
+import type Filter from "../components/classes/Filter";
 
-export interface Item {
-    title: string;
-    path: string;
-    icon: ComponentType<any>;
+export interface DataTableProducts {
+    products: Product[];
+    pages: number;
 }
 
-
-export interface DataTableProducts{
-    products: Product[],
-    pages: number
-}
-
-export interface PageProductsData{
+export interface PageProductsData {
     pageNumber: number;
     sort: Sort;
-    filters: Filter[]
+    filters: Filter[];
 }
-
