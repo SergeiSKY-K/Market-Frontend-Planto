@@ -24,10 +24,23 @@ export default function ProductsView() {
     const [sp, setSp] = useSearchParams();
     const currentCategory = sp.get("category") ?? "";
 
+    // Приводим тип products к массиву ProductLike для безопасной работы
+    const safeProducts = useMemo(() => {
+        if (!Array.isArray(products)) return [];
+        return products.map(p => ({
+            id: p.id ?? '',
+            name: p.name ?? '',
+            category: (p as any).category ?? '',
+            price: (p as any).price ?? 0,
+            supplierLogin: (p as any).supplierLogin ?? (p as any).supplier?.login ?? '',
+            supplier: (p as any).supplier,
+        })) as ProductLike[];
+    }, [products]);
+
     const categories = useMemo(() => {
         const s = new Set<string>();
 
-        for (const p of products as unknown as ProductLike[]) {
+        for (const p of safeProducts) {
             const cat = String(p.category ?? "").trim();
             if (cat) s.add(cat);
         }
@@ -35,7 +48,7 @@ export default function ProductsView() {
         const list = Array.from(s).sort((a, b) => a.localeCompare(b));
         if (currentCategory && !list.includes(currentCategory)) list.unshift(currentCategory);
         return list;
-    }, [products, currentCategory]);
+    }, [safeProducts, currentCategory]);
 
     const setCategoryParam = (v: string) => {
         const next = new URLSearchParams(sp);
@@ -96,10 +109,10 @@ export default function ProductsView() {
                 </thead>
 
                 <tbody>
-                {(products as unknown as ProductLike[]).map((p) => (
+                {safeProducts.map((p) => (
                     <RowProductsTable
                         key={String(p.id)}
-                        product={p as any}
+                        product={p}
                         onSavedLocal={(np: any) =>
                             setProductsData((prev: any) => ({
                                 ...prev,
