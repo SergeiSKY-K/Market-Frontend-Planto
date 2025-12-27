@@ -31,7 +31,6 @@ export default function SupplierProductsPage() {
                             onSavedLocal={(np)=>setItems(prev=>prev.map(x=>x.id===np.id?np:x))}
                             onDeletedLocal={()=>setItems(prev=>prev.filter(x=>x.id!==p.id))}
                             onAddToCart={()=>{}}
-                            showStatus
                         />
                     ))}
                     </tbody>
