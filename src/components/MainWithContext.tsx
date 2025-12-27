@@ -1,4 +1,3 @@
-// src/MainWithContext.tsx
 import { useState } from "react";
 import Main from "./Main";
 import { PageContext } from "../utils/context";

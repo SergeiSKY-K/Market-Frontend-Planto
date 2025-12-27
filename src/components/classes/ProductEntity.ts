@@ -1,4 +1,4 @@
-export default class Product {
+export default class ProductEntity {
 
     private readonly _id: string
     private _name: string
