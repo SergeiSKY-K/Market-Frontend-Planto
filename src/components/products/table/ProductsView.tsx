@@ -4,15 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { ProductsContext } from "../../../utils/context";
 import RowProductsTable from "./RowProductsTable";
 import { addToCart } from "../../../store/cartSlice";
-
-type ProductLike = {
-    id: string | number;
-    name: string;
-    category?: unknown;
-    price?: number;
-    supplierLogin?: string;
-    supplier?: { login?: string };
-};
+import type { Product } from "../../../utils/types/Product";
 
 export default function ProductsView() {
     const { products, setProductsData } = useContext(ProductsContext);
@@ -21,44 +13,38 @@ export default function ProductsView() {
     const [sp, setSp] = useSearchParams();
     const currentCategory = sp.get("category") ?? "";
 
-    const safeProducts = useMemo<ProductLike[]>(() => {
-        return Array.isArray(products) ? products : [];
-    }, [products]);
-
     const categories = useMemo(() => {
         const s = new Set<string>();
 
-        for (const p of safeProducts) {
-            const raw = (p as any)?.category;
+        for (const p of products) {
             const cat =
-                typeof raw === "string"
-                    ? raw
-                    : (raw?.name ?? "");
-
-            const clean = String(cat).trim();
-            if (clean) s.add(clean);
+                typeof p.category === "string"
+                    ? p.category
+                    : p.category?.name ?? "";
+            if (cat.trim()) s.add(cat.trim());
         }
 
         const list = Array.from(s).sort((a, b) => a.localeCompare(b));
-        if (currentCategory && !list.includes(currentCategory)) list.unshift(currentCategory);
+        if (currentCategory && !list.includes(currentCategory)) {
+            list.unshift(currentCategory);
+        }
         return list;
-    }, [safeProducts, currentCategory]);
+    }, [products, currentCategory]);
 
     const setCategoryParam = (v: string) => {
         const next = new URLSearchParams(sp);
-        if (v) next.set("category", v);
-        else next.delete("category");
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+        v ? next.set("category", v) : next.delete("category");
         setSp(next, { replace: true });
     };
 
-    const handleAddToCart = (p: ProductLike) => {
+    const handleAddToCart = (p: Product) => {
         dispatch(
             addToCart({
-                id: String(p.id),
-                name: String(p.name ?? ""),
-                price: Number((p as any)?.price) || 0,
-                supplierLogin:
-                    (p as any)?.supplierLogin ?? (p as any)?.supplier?.login ?? "",
+                id: p.id,
+                name: p.name,
+                price: p.price ?? 0,
+                supplierLogin: p.supplierLogin ?? p.supplier?.login ?? "",
                 qty: 1,
             })
         );
@@ -68,7 +54,6 @@ export default function ProductsView() {
         <div className="overflow-x-auto">
             <div className="mb-3 flex items-center gap-3">
                 <label className="opacity-70">Filter by category:</label>
-
                 <select
                     className="inputField w-56"
                     value={currentCategory}
@@ -76,51 +61,24 @@ export default function ProductsView() {
                 >
                     <option value="">All categories</option>
                     {categories.map((c) => (
-                        <option key={c} value={c}>
-                            {c}
-                        </option>
+                        <option key={c} value={c}>{c}</option>
                     ))}
                 </select>
-
-                {currentCategory && (
-                    <button className="action-btn" onClick={() => setCategoryParam("")}>
-                        Reset
-                    </button>
-                )}
             </div>
 
             <table className="w-full table-auto">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-
                 <tbody>
-                {safeProducts.map((p) => (
+                {products.map((p) => (
                     <RowProductsTable
-                        key={String(p.id)}
-                        product={p as any}
+                        key={p.id}
+                        product={p}
                         onAddToCart={() => handleAddToCart(p)}
-                        onSavedLocal={(np: any) =>
-                            setProductsData((prev: any) => ({
-                                ...prev,
-                                products: prev.products.map((x: any) => (x.id === np.id ? np : x)),
-                            }))
-                        }
-                        onDeletedLocal={() =>
-                            setProductsData((prev: any) => ({
-                                ...prev,
-                                products: prev.products.filter((x: any) => x.id !== p.id),
-                            }))
-                        }
-                        onBlockedLocal={() =>
-                            setProductsData((prev: any) => ({
-                                ...prev,
-                                products: prev.products.filter((x: any) => x.id !== p.id),
+                        onSavedLocal={(np) =>
+                            setProductsData(prev => ({
+                                products: prev.products.map(x =>
+                                    x.id === np.id ? np : x
+                                ),
+                                pages: prev.pages,
                             }))
                         }
                     />
