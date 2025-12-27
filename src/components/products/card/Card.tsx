@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ShoppingCart } from "lucide-react";
 import { Image } from "@imagekit/react";
 import ImagePopup from "../ImagePopup";
-import type { Product } from "../../../utils/types/product.ts";
+import type { Product } from "../../../utils/types/product";
 
 interface PropsProduct {
     product: Product;

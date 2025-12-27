@@ -4,17 +4,10 @@ import { useSearchParams } from "react-router-dom";
 import { ProductsContext } from "../../../utils/context";
 import RowProductsTable from "./RowProductsTable";
 import { addToCart } from "../../../store/cartSlice";
-import type { Product } from "../../../utils/types/product.ts";
+import type { Product } from "../../../utils/types/product";
 
 export default function ProductsView() {
-    const ctx = useContext(ProductsContext) as {
-        products: Product[];
-        setProductsData: React.Dispatch<
-            React.SetStateAction<{ products: Product[]; pages: number }>
-        >;
-    };
-
-    const { products, setProductsData } = ctx;
+    const { products, setProductsData } = useContext(ProductsContext);
     const dispatch = useDispatch();
 
     const [sp, setSp] = useSearchParams();
@@ -29,10 +22,10 @@ export default function ProductsView() {
                     ? p.category
                     : p.category?.name ?? "";
 
-            if (cat) s.add(cat);
+            if (cat.trim()) s.add(cat.trim());
         }
 
-        return Array.from(s).sort();
+        return Array.from(s).sort((a, b) => a.localeCompare(b));
     }, [products]);
 
     const setCategoryParam = (v: string) => {
@@ -73,7 +66,7 @@ export default function ProductsView() {
 
             <table className="w-full table-auto">
                 <tbody>
-                {products.map((p: Product) => (
+                {products.map((p) => (
                     <RowProductsTable
                         key={p.id}
                         product={p}

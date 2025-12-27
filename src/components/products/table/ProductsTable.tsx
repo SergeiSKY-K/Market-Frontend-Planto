@@ -1,6 +1,6 @@
 import { Ban } from "lucide-react";
 import { toggleProductStatus } from "../../../features/api/productAction";
-import type { Product } from "../../../utils/types/product.ts";
+import type { Product } from "../../../utils/types/product";
 type RowProps = {
     product: Product;
     onSavedLocal?: (p: Product) => void;
