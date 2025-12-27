@@ -1,4 +1,4 @@
-import type { Product } from "./types/Product";
+import type { Product } from "./types/product.ts";
 import type Sort from "../components/classes/Sort";
 import type Filter from "../components/classes/Filter";
 import type { ComponentType } from "react";

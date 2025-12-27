@@ -19,7 +19,7 @@ import {
     toggleProductStatus,
 } from "../../../features/api/productAction";
 
-import type { Product } from "../../../utils/types/Product";
+import type { Product } from "../../../utils/types/product.ts";
 
 type Props = {
     product: Product;

@@ -4,7 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { ProductsContext } from "../../../utils/context";
 import RowProductsTable from "./RowProductsTable";
 import { addToCart } from "../../../store/cartSlice";
-import type { Product } from "../../../utils/types/Product";
+import type { Product } from "../../../utils/types/product.ts";
 
 export default function ProductsView() {
     const ctx = useContext(ProductsContext) as {
