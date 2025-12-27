@@ -18,21 +18,19 @@ interface PageContextType {
     setPage: Dispatch<SetStateAction<PageProductsData>>;
 }
 
-export const ProductsContext =
-    React.createContext<ProductsContextType>({
-        products: [] as Product[], // 🔥 ВАЖНО
-        pages: 0,
-        setProductsData: () => {
-            throw new Error("setProductsData not initialized");
-        },
-    });
+export const ProductsContext = React.createContext<ProductsContextType>({
+    products: [] as Product[], // 🔥 ВАЖНО: убивает never[]
+    pages: 0,
+    setProductsData: () => {
+        throw new Error("ProductsContext: setProductsData is not provided");
+    },
+});
 
-export const PageContext =
-    React.createContext<PageContextType>({
-        pageNumber: 1,
-        sort: DEFAULT_SORT,
-        filters: [],
-        setPage: () => {
-            throw new Error("setPage not initialized");
-        },
-    });
+export const PageContext = React.createContext<PageContextType>({
+    pageNumber: 1,
+    sort: DEFAULT_SORT,
+    filters: [] as Filter[],
+    setPage: () => {
+        throw new Error("PageContext: setPage is not provided");
+    },
+});
