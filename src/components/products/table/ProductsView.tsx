@@ -73,17 +73,17 @@ export default function ProductsView() {
 
             <table className="w-full table-auto">
                 <tbody>
-                {products.map((p) => (
+                {products.map((p: Product) => (
                     <RowProductsTable
                         key={p.id}
                         product={p}
                         onAddToCart={() => handleAddToCart(p)}
                         onSavedLocal={(np) =>
                             setProductsData((prev) => ({
-                                ...prev,
                                 products: prev.products.map((x) =>
                                     x.id === np.id ? np : x
                                 ),
+                                pages: prev.pages,
                             }))
                         }
                     />
