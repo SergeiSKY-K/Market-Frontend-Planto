@@ -7,7 +7,10 @@ import { addToCart } from "../../../store/cartSlice";
 import type { Product } from "../../../utils/types/Product";
 
 export default function ProductsView() {
-    const { products, setProductsData } = useContext(ProductsContext);
+    const ctx = useContext(ProductsContext);
+    if (!ctx) throw new Error("ProductsContext not provided");
+
+    const { products, setProductsData } = ctx;
     const dispatch = useDispatch();
 
     const [sp, setSp] = useSearchParams();
@@ -33,7 +36,6 @@ export default function ProductsView() {
 
     const setCategoryParam = (v: string) => {
         const next = new URLSearchParams(sp);
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         v ? next.set("category", v) : next.delete("category");
         setSp(next, { replace: true });
     };
