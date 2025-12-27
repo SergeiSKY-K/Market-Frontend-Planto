@@ -7,15 +7,7 @@ import { addToCart } from "../../../store/cartSlice";
 import type { Product } from "../../../utils/types/Product";
 
 export default function ProductsView() {
-    const ctx = useContext(ProductsContext) as {
-        products: Product[];
-        setProductsData: React.Dispatch<React.SetStateAction<{
-            products: Product[];
-            pages: number;
-        }>>;
-    };
-
-    const { products, setProductsData } = ctx;
+    const { products, setProductsData } = useContext(ProductsContext);
     const dispatch = useDispatch();
 
     const [sp, setSp] = useSearchParams();
@@ -32,12 +24,8 @@ export default function ProductsView() {
             if (cat.trim()) s.add(cat.trim());
         }
 
-        const list = Array.from(s).sort((a, b) => a.localeCompare(b));
-        if (currentCategory && !list.includes(currentCategory)) {
-            list.unshift(currentCategory);
-        }
-        return list;
-    }, [products, currentCategory]);
+        return Array.from(s).sort((a, b) => a.localeCompare(b));
+    }, [products]);
 
     const setCategoryParam = (v: string) => {
         const next = new URLSearchParams(sp);
@@ -49,7 +37,7 @@ export default function ProductsView() {
         dispatch(
             addToCart({
                 id: p.id,
-                name: p.name, // ✅ больше не never
+                name: p.name,
                 price: p.price ?? 0,
                 supplierLogin: p.supplierLogin ?? p.supplier?.login ?? "",
                 qty: 1,
@@ -75,12 +63,12 @@ export default function ProductsView() {
 
             <table className="w-full table-auto">
                 <tbody>
-                {products.map((p: Product) => (
+                {products.map((p) => (
                     <RowProductsTable
                         key={p.id}
                         product={p}
                         onAddToCart={() => handleAddToCart(p)}
-                        onSavedLocal={(np: Product) =>
+                        onSavedLocal={(np) =>
                             setProductsData(prev => ({
                                 products: prev.products.map(x =>
                                     x.id === np.id ? np : x
