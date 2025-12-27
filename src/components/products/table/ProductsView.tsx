@@ -7,13 +7,20 @@ import { addToCart } from "../../../store/cartSlice";
 import type { Product } from "../../../utils/types/Product";
 
 export default function ProductsView() {
-    const { products, setProductsData } = useContext(ProductsContext);
+    const ctx = useContext(ProductsContext) as {
+        products: Product[];
+        setProductsData: React.Dispatch<
+            React.SetStateAction<{ products: Product[]; pages: number }>
+        >;
+    };
+
+    const { products, setProductsData } = ctx;
     const dispatch = useDispatch();
 
     const [sp, setSp] = useSearchParams();
     const currentCategory = sp.get("category") ?? "";
 
-    const categories = useMemo(() => {
+    const categories = useMemo<string[]>(() => {
         const s = new Set<string>();
 
         for (const p of products) {
@@ -21,10 +28,11 @@ export default function ProductsView() {
                 typeof p.category === "string"
                     ? p.category
                     : p.category?.name ?? "";
-            if (cat.trim()) s.add(cat.trim());
+
+            if (cat) s.add(cat);
         }
 
-        return Array.from(s).sort((a, b) => a.localeCompare(b));
+        return Array.from(s).sort();
     }, [products]);
 
     const setCategoryParam = (v: string) => {
@@ -56,7 +64,9 @@ export default function ProductsView() {
                 >
                     <option value="">All categories</option>
                     {categories.map((c) => (
-                        <option key={c} value={c}>{c}</option>
+                        <option key={c} value={c}>
+                            {c}
+                        </option>
                     ))}
                 </select>
             </div>
@@ -69,11 +79,11 @@ export default function ProductsView() {
                         product={p}
                         onAddToCart={() => handleAddToCart(p)}
                         onSavedLocal={(np) =>
-                            setProductsData(prev => ({
-                                products: prev.products.map(x =>
+                            setProductsData((prev) => ({
+                                ...prev,
+                                products: prev.products.map((x) =>
                                     x.id === np.id ? np : x
                                 ),
-                                pages: prev.pages,
                             }))
                         }
                     />
