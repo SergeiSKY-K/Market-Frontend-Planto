@@ -7,8 +7,13 @@ import { addToCart } from "../../../store/cartSlice";
 import type { Product } from "../../../utils/types/Product";
 
 export default function ProductsView() {
-    const ctx = useContext(ProductsContext);
-    if (!ctx) throw new Error("ProductsContext not provided");
+    const ctx = useContext(ProductsContext) as {
+        products: Product[];
+        setProductsData: React.Dispatch<React.SetStateAction<{
+            products: Product[];
+            pages: number;
+        }>>;
+    };
 
     const { products, setProductsData } = ctx;
     const dispatch = useDispatch();
@@ -44,7 +49,7 @@ export default function ProductsView() {
         dispatch(
             addToCart({
                 id: p.id,
-                name: p.name,
+                name: p.name, // ✅ больше не never
                 price: p.price ?? 0,
                 supplierLogin: p.supplierLogin ?? p.supplier?.login ?? "",
                 qty: 1,
@@ -70,12 +75,12 @@ export default function ProductsView() {
 
             <table className="w-full table-auto">
                 <tbody>
-                {products.map((p) => (
+                {products.map((p: Product) => (
                     <RowProductsTable
                         key={p.id}
                         product={p}
                         onAddToCart={() => handleAddToCart(p)}
-                        onSavedLocal={(np) =>
+                        onSavedLocal={(np: Product) =>
                             setProductsData(prev => ({
                                 products: prev.products.map(x =>
                                     x.id === np.id ? np : x
