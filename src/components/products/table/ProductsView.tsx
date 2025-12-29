@@ -71,12 +71,27 @@ export default function ProductsView() {
                         key={p.id}
                         product={p}
                         onAddToCart={() => handleAddToCart(p)}
+
                         onSavedLocal={(np) =>
                             setProductsData((prev) => ({
+                                ...prev,
                                 products: prev.products.map((x) =>
                                     x.id === np.id ? np : x
                                 ),
-                                pages: prev.pages,
+                            }))
+                        }
+
+                        onDeletedLocal={() =>
+                            setProductsData((prev) => ({
+                                ...prev,
+                                products: prev.products.filter((x) => x.id !== p.id),
+                            }))
+                        }
+
+                        onBlockedLocal={() =>
+                            setProductsData((prev) => ({
+                                ...prev,
+                                products: prev.products.filter((x) => x.id !== p.id),
                             }))
                         }
                     />
