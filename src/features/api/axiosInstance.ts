@@ -11,24 +11,23 @@ const axiosInstance = axios.create({
 });
 
 
-axiosInstance.interceptors.request.use((config) => {
-    const token = store.getState().token.accessToken;
-    if (token) {
-        config.headers = config.headers ?? {};
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
-
-
 axiosInstance.interceptors.response.use(
     r => r,
     async error => {
         const original = error.config;
         const status = error?.response?.status;
+        const url = original?.url ?? "";
 
 
-        if (status === 401 && !original?._retry) {
+        if (
+            url.includes("/auth/login") ||
+            url.includes("/auth/register") ||
+            url.includes("/auth/refresh")
+        ) {
+            return Promise.reject(error);
+        }
+
+        if (status === 401 && !original._retry) {
             original._retry = true;
 
             try {
@@ -43,11 +42,11 @@ axiosInstance.interceptors.response.use(
 
                 if (newToken) {
                     store.dispatch(setAccessToken(newToken));
+                    original.headers = original.headers ?? {};
                     original.headers.Authorization = `Bearer ${newToken}`;
                     return axiosInstance(original);
                 }
-            } catch {
-
+            } catch (e) {
                 store.dispatch(clearAccessToken());
                 store.dispatch(clearUser());
             }
@@ -56,6 +55,5 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(error);
     }
 );
-
 
 export default axiosInstance;
