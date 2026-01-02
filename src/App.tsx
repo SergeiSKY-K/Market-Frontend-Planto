@@ -2,7 +2,6 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
-import { setAccessToken } from "./store/tokenSlice";
 import axiosInstance from "./features/api/axiosInstance";
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -22,6 +21,7 @@ import ModeratorOrdersPage from "./components/ModeratorOrdersPage";
 import CartPage from "./components/CartPage";
 import SupplierProductsPage from "./components/SupplierProductsPage";
 import ModeratorBlockedPage from "./components/ModeratorBlockedPage";
+import SuppliersPage from "./components/SuppliersPage.tsx";
 
 export default function App() {
     const dispatch = useDispatch();
@@ -40,12 +40,7 @@ export default function App() {
 
         const bootstrapAuth = async () => {
             try {
-                const resp = await axiosInstance.post("/auth/refresh");
-                const token = resp.data?.accessToken;
-
-                if (token) {
-                    dispatch(setAccessToken(token));
-                }
+                await axiosInstance.post("/auth/refresh");
             } catch {
                 // не залогинен — ок
             } finally {
@@ -64,30 +59,47 @@ export default function App() {
         <Routes>
             <Route path="/login" element={<LoginForm />} />
             <Route path="/register" element={<RegisterForm />} />
-
             <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<MainWithContext />}>
                     <Route index element={<Home />} />
+
                     <Route path="products" element={<ProductsManager />} />
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="cart" element={<CartPage />} />
                     <Route path="orders" element={<MyOrdersPage />} />
 
-                    <Route element={<ProtectedRoute allowedRoles={["SUPPLIER", "ADMINISTRATOR"]} />}>
+
+                    <Route
+                        element={<ProtectedRoute allowedRoles={["SUPPLIER", "ADMINISTRATOR"]} />}
+                    >
                         <Route path="supplier/orders" element={<SupplierOrdersPage />} />
                         <Route path="supplier/my-products" element={<SupplierProductsPage />} />
                     </Route>
 
-                    <Route element={<ProtectedRoute allowedRoles={["MODERATOR"]} />}>
+
+                    <Route
+                        element={<ProtectedRoute allowedRoles={["MODERATOR"]} />}
+                    >
                         <Route path="moderator/orders" element={<ModeratorOrdersPage />} />
                         <Route path="moderator/blacklist" element={<ModeratorBlockedPage />} />
                     </Route>
 
-                    <Route element={<ProtectedRoute allowedRoles={["ADMINISTRATOR"]} />}>
+
+                    <Route
+                        element={<ProtectedRoute allowedRoles={["MODERATOR", "ADMINISTRATOR"]} />}
+                    >
+                        <Route path="suppliers" element={<SuppliersPage />} />
+                    </Route>
+
+
+                    <Route
+                        element={<ProtectedRoute allowedRoles={["ADMINISTRATOR"]} />}
+                    >
                         <Route path="admin/users" element={<AdminUsersPage />} />
                     </Route>
                 </Route>
             </Route>
+
 
             <Route path="*" element={<ErrorPage msg="Page not found" />} />
         </Routes>
