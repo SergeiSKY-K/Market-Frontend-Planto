@@ -1,13 +1,24 @@
 import axios from "axios";
 import { store } from "../../store/store";
 import { setAccessToken, clearAccessToken } from "../../store/tokenSlice";
-import {clearUser} from "../../store/userSlice.ts";
+import { clearUser } from "../../store/userSlice";
 
 const API = import.meta.env.VITE_BASE_API_URL || "";
 
 const axiosInstance = axios.create({
     baseURL: API,
     withCredentials: true,
+});
+
+axiosInstance.interceptors.request.use(config => {
+    const token = store.getState().token.accessToken;
+
+    if (token) {
+        config.headers = config.headers ?? {};
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    return config;
 });
 
 
@@ -17,7 +28,6 @@ axiosInstance.interceptors.response.use(
         const original = error.config;
         const status = error?.response?.status;
         const url = original?.url ?? "";
-
 
         if (
             url.includes("/auth/login") ||
@@ -46,7 +56,7 @@ axiosInstance.interceptors.response.use(
                     original.headers.Authorization = `Bearer ${newToken}`;
                     return axiosInstance(original);
                 }
-            } catch (e) {
+            } catch {
                 store.dispatch(clearAccessToken());
                 store.dispatch(clearUser());
             }
