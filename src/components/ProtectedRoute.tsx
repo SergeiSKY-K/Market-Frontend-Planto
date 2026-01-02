@@ -8,14 +8,19 @@ type Props = {
 };
 
 export default function ProtectedRoute({ allowedRoles }: Props) {
-    const token = useSelector((s: RootState) => s.token.accessToken);
+    const { accessToken, ready } = useSelector((s: RootState) => s.token);
 
-    if (!token) {
+
+    if (!ready) {
+        return null;
+    }
+
+    if (!accessToken) {
         return <Navigate to="/login" replace />;
     }
 
     if (allowedRoles?.length) {
-        const roles = getRolesFromJwt(token);
+        const roles = getRolesFromJwt(accessToken);
         const hasAccess = roles.some(r => allowedRoles.includes(r));
 
         if (!hasAccess) {
@@ -25,3 +30,4 @@ export default function ProtectedRoute({ allowedRoles }: Props) {
 
     return <Outlet />;
 }
+

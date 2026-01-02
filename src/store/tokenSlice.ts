@@ -1,12 +1,14 @@
-import{ createSlice } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
 interface TokenState {
     accessToken: string | null;
+    ready: boolean;
 }
 
 const initialState: TokenState = {
     accessToken: null,
+    ready: false,
 };
 
 const tokenSlice = createSlice({
@@ -19,9 +21,16 @@ const tokenSlice = createSlice({
         clearAccessToken(state) {
             state.accessToken = null;
         },
+        setAuthReady(state) {
+            state.ready = true;
+        },
     },
 });
 
-export const { setAccessToken, clearAccessToken } = tokenSlice.actions;
-export default tokenSlice.reducer;
+export const {
+    setAccessToken,
+    clearAccessToken,
+    setAuthReady,
+} = tokenSlice.actions;
 
+export default tokenSlice.reducer;

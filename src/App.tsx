@@ -1,9 +1,9 @@
 import { Routes, Route } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
 import axiosInstance from "./features/api/axiosInstance";
-import { setAccessToken } from "./store/tokenSlice";
+import { setAccessToken, setAuthReady } from "./store/tokenSlice";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainWithContext from "./components/MainWithContext";
@@ -26,13 +26,11 @@ import SuppliersPage from "./components/SuppliersPage";
 
 export default function App() {
     const dispatch = useDispatch();
-    const [ready, setReady] = useState(false);
 
     useEffect(() => {
         const init = async () => {
             try {
                 const resp = await axiosInstance.post("/auth/refresh");
-
                 const authHeader = resp.headers["authorization"];
                 const token = authHeader?.replace("Bearer ", "");
 
@@ -42,14 +40,12 @@ export default function App() {
             } catch {
                 // не залогинен — нормально
             } finally {
-                setReady(true);
+                dispatch(setAuthReady());
             }
         };
 
         init();
     }, [dispatch]);
-
-    if (!ready) return null;
 
     return (
         <Routes>
