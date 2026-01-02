@@ -33,16 +33,23 @@ const ProductsManager = () => {
 
     return (
         <div className="col-span-6">
-            <ProductsContext.Provider
-                value={{
-                    products: productsData.products,
-                    pages: productsData.pages,
-                    setProductsData,
-                }}
-            >
+            <ProductsContext.Provider value={{ products: productsData.products, pages: productsData.pages, setProductsData }}>
                 <AddProduct />
-                <ProductsView />
+
+                <div
+                    className="mt-6 rounded-xl p-4"
+                    style={{
+                        backgroundImage: "url(/products-bg.jpg)",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                    }}
+                >
+                    <div className="backdrop-blur-sm bg-white/80 rounded-lg p-4">
+                        <ProductsView />
+                    </div>
+                </div>
             </ProductsContext.Provider>
+
         </div>
     );
 };
