@@ -64,14 +64,26 @@ export default function ProductsView() {
                 </select>
             </div>
 
-            <table className="w-full table-auto">
-                <tbody>
+            <table className="w-full table-auto border-collapse">
+                <thead>
+                <tr className="bg-[#1f3d2b] text-white text-left">
+                    <th className="pl-2 py-2 w-[70px]"></th>
+                    <th className="pl-2 py-2">Name</th>
+                    <th className="pl-2 py-2">Category</th>
+                    <th className="pl-2 py-2 w-[100px]">Quantity</th>
+                    <th className="pl-2 py-2 w-[100px]">Price</th>
+                    <th className="pl-2 py-2 hidden xl:table-cell">Description</th>
+                    <th className="pl-2 py-2 w-[160px] text-center">Actions</th>
+                    <th className="pl-2 py-2 w-[64px] text-center"></th>
+                </tr>
+                </thead>
+
+                <tbody className="bg-white/90">
                 {products.map((p) => (
                     <RowProductsTable
                         key={p.id}
                         product={p}
                         onAddToCart={() => handleAddToCart(p)}
-
                         onSavedLocal={(np) =>
                             setProductsData((prev) => ({
                                 ...prev,
@@ -80,14 +92,12 @@ export default function ProductsView() {
                                 ),
                             }))
                         }
-
                         onDeletedLocal={() =>
                             setProductsData((prev) => ({
                                 ...prev,
                                 products: prev.products.filter((x) => x.id !== p.id),
                             }))
                         }
-
                         onBlockedLocal={() =>
                             setProductsData((prev) => ({
                                 ...prev,
@@ -98,6 +108,7 @@ export default function ProductsView() {
                 ))}
                 </tbody>
             </table>
+
         </div>
     );
 }
