@@ -1,6 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { CreateOrderDto, OrderResponseDto, Page } from "../utils/types/orders";
-import { createOrder, getMyOrders, payOrder, getSupplierOrders, getModeratorOrders } from "../features/api/orders";
+import {
+    createOrder,
+    getMyOrders,
+    payOrder,
+    getSupplierOrders,
+    getModeratorOrders,
+    deleteOrder
+} from "../features/api/orders";
 import type { RootState } from "./store";
 
 const tokenSel = (s: RootState) => s.token.accessToken as string;
@@ -27,6 +34,18 @@ export const thunkFetchModerator = createAsyncThunk<
     getModeratorOrders(tokenSel(getState()), q?.page, q?.size, q?.sortBy, q?.direction)
 );
 
+export const thunkDeleteOrder = createAsyncThunk<
+    string,
+    string,
+    { state: RootState }
+>(
+    "orders/delete",
+    async (orderId, { getState }) => {
+        await deleteOrder(orderId, tokenSel(getState()));
+        return orderId;
+    }
+);
+
 type OrdersState = {
     my: OrderResponseDto[];
     supplier: OrderResponseDto[];
@@ -50,7 +69,9 @@ const ordersSlice = createSlice({
             const i = s.my.findIndex(o => o.id === a.payload.id);
             if (i >= 0) s.my[i] = a.payload;
         });
-
+        b.addCase(thunkDeleteOrder.fulfilled, (s, a) => {
+            s.my = s.my.filter(o => o.id !== a.payload);
+        });
         b.addCase(thunkFetchMy.fulfilled, (s, a) => { s.my = a.payload ?? []; });
         b.addCase(thunkFetchSupplier.fulfilled, (s, a) => { s.supplier = a.payload ?? []; });
         b.addCase(thunkFetchModerator.fulfilled, (s, a) => { s.mod = a.payload; });

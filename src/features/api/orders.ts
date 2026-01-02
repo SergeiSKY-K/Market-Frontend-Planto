@@ -1,5 +1,6 @@
 import api from "./axiosInstance";
 import type { CreateOrderDto, OrderResponseDto, Page } from "../../utils/types/orders";
+import axiosInstance from "./axiosInstance";
 
 export const createOrder = (dto: CreateOrderDto, token: string) =>
     api.post<OrderResponseDto>("/orders", dto, { headers: { Authorization: `Bearer ${token}` } })
@@ -8,6 +9,15 @@ export const createOrder = (dto: CreateOrderDto, token: string) =>
 export const payOrder = (id: string, token: string) =>
     api.post<OrderResponseDto>(`/orders/${id}/pay`, null, { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.data);
+
+export const deleteOrder = async (id: string, token: string) => {
+    await axiosInstance.delete(`/orders/${id}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+};
+
 
 export const getMyOrders = (token: string) =>
     api.get<OrderResponseDto[]>("/orders/my", { headers: { Authorization: `Bearer ${token}` } })

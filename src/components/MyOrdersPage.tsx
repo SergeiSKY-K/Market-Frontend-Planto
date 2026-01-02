@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../store/hooks";
-import { thunkFetchMy, thunkPayOrder } from "../store/ordersSlice";
+import {thunkDeleteOrder, thunkFetchMy, thunkPayOrder} from "../store/ordersSlice";
 import { localDT } from "../utils/datetime";
 
 export default function MyOrdersPage() {
@@ -45,12 +45,21 @@ export default function MyOrdersPage() {
                         {/* Action */}
                         <td>
                             {o.status === "CREATED" && (
-                                <button
-                                    className="px-3 py-1 border rounded"
-                                    onClick={() => d(thunkPayOrder(o.id))}
-                                >
-                                    Pay
-                                </button>
+                                <>
+                                    <button
+                                        className="px-3 py-1 border rounded mr-2"
+                                        onClick={() => d(thunkPayOrder(o.id))}
+                                    >
+                                        Pay
+                                    </button>
+
+                                    <button
+                                        className="px-3 py-1 border rounded text-red-600"
+                                        onClick={() => d(thunkDeleteOrder(o.id))}
+                                    >
+                                        Delete
+                                    </button>
+                                </>
                             )}
                         </td>
                     </tr>
