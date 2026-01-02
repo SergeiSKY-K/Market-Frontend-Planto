@@ -1,8 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import axiosInstance from "./features/api/axiosInstance";
+import type { RootState } from "./store/store";
 import { setAccessToken, setAuthReady } from "./store/tokenSlice";
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -26,28 +27,33 @@ import SuppliersPage from "./components/SuppliersPage";
 
 export default function App() {
     const dispatch = useDispatch();
+    const ready = useSelector((s: RootState) => s.token.ready);
 
     useEffect(() => {
         const init = async () => {
             try {
                 const resp = await axiosInstance.post("/auth/refresh");
 
-                const authHeader = resp.headers["authorization"];
+                
+                const authHeader =
+                    resp.headers?.authorization || resp.headers?.Authorization;
+
                 const token = authHeader?.replace("Bearer ", "");
 
                 if (token) {
                     dispatch(setAccessToken(token));
-                    return; // ⛔ ВАЖНО: дальше не идём
                 }
-            } catch {
-                // refresh невалиден — ок
+            } catch { /* empty */ } finally {
+               
+                dispatch(setAuthReady());
             }
-
-            dispatch(setAuthReady()); // ⬅️ только если токена нет
         };
 
         init();
     }, [dispatch]);
+
+   
+    if (!ready) return null;
 
     return (
         <Routes>
@@ -57,6 +63,7 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<MainWithContext />}>
                     <Route index element={<Home />} />
+
                     <Route path="products" element={<ProductsManager />} />
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="cart" element={<CartPage />} />
