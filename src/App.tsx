@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axiosInstance from "./features/api/axiosInstance";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainWithContext from "./components/MainWithContext";
@@ -20,6 +22,24 @@ import ModeratorBlockedPage from "./components/ModeratorBlockedPage";
 import SuppliersPage from "./components/SuppliersPage";
 
 export default function App() {
+    const [ready, setReady] = useState(false);
+
+    useEffect(() => {
+        const init = async () => {
+            try {
+                await axiosInstance.post("/auth/refresh");
+            } catch {
+            } finally {
+                setReady(true);
+            }
+        };
+
+        init();
+    }, []);
+
+
+    if (!ready) return null;
+
     return (
         <Routes>
             <Route path="/login" element={<LoginForm />} />
