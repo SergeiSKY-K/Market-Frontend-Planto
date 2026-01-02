@@ -1,8 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-
-import axiosInstance from "./features/api/axiosInstance";
+import { Routes, Route } from "react-router-dom";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainWithContext from "./components/MainWithContext";
@@ -24,35 +20,6 @@ import ModeratorBlockedPage from "./components/ModeratorBlockedPage";
 import SuppliersPage from "./components/SuppliersPage";
 
 export default function App() {
-    const dispatch = useDispatch();
-    const location = useLocation();
-    const [bootstrapped, setBootstrapped] = useState(false);
-
-    useEffect(() => {
-        const isAuthPage =
-            location.pathname === "/login" ||
-            location.pathname === "/register";
-
-        if (isAuthPage) {
-            setBootstrapped(true);
-            return;
-        }
-
-        const bootstrapAuth = async () => {
-            try {
-                await axiosInstance.post("/auth/refresh");
-            } catch { /* empty */ } finally {
-                setBootstrapped(true);
-            }
-        };
-
-        bootstrapAuth();
-    }, [dispatch, location.pathname]);
-
-    if (!bootstrapped) {
-        return <div>Loading...</div>;
-    }
-
     return (
         <Routes>
             <Route path="/login" element={<LoginForm />} />
@@ -66,50 +33,22 @@ export default function App() {
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="cart" element={<CartPage />} />
                     <Route path="orders" element={<MyOrdersPage />} />
-                    
-                    <Route
-                        element={
-                            <ProtectedRoute
-                                allowedRoles={["SUPPLIER", "ADMINISTRATOR"]}
-                            />
-                        }
-                    >
+
+                    <Route element={<ProtectedRoute allowedRoles={["SUPPLIER", "ADMINISTRATOR"]} />}>
                         <Route path="supplier/orders" element={<SupplierOrdersPage />} />
-                        <Route
-                            path="supplier/my-products"
-                            element={<SupplierProductsPage />}
-                        />
+                        <Route path="supplier/my-products" element={<SupplierProductsPage />} />
                     </Route>
-                    
-                    <Route
-                        element={
-                            <ProtectedRoute
-                                allowedRoles={["MODERATOR", "ADMINISTRATOR"]}
-                            />
-                        }
-                    >
+
+                    <Route element={<ProtectedRoute allowedRoles={["MODERATOR", "ADMINISTRATOR"]} />}>
                         <Route path="moderator/orders" element={<ModeratorOrdersPage />} />
-                        <Route
-                            path="moderator/blacklist"
-                            element={<ModeratorBlockedPage />}
-                        />
+                        <Route path="moderator/blacklist" element={<ModeratorBlockedPage />} />
                     </Route>
-                    
-                    <Route
-                        element={
-                            <ProtectedRoute
-                                allowedRoles={["MODERATOR", "ADMINISTRATOR"]}
-                            />
-                        }
-                    >
+
+                    <Route element={<ProtectedRoute allowedRoles={["MODERATOR", "ADMINISTRATOR"]} />}>
                         <Route path="suppliers" element={<SuppliersPage />} />
                     </Route>
-                    
-                    <Route
-                        element={
-                            <ProtectedRoute allowedRoles={["ADMINISTRATOR"]} />
-                        }
-                    >
+
+                    <Route element={<ProtectedRoute allowedRoles={["ADMINISTRATOR"]} />}>
                         <Route path="admin/users" element={<AdminUsersPage />} />
                     </Route>
                 </Route>
