@@ -31,17 +31,19 @@ export default function App() {
         const init = async () => {
             try {
                 const resp = await axiosInstance.post("/auth/refresh");
+
                 const authHeader = resp.headers["authorization"];
                 const token = authHeader?.replace("Bearer ", "");
 
                 if (token) {
                     dispatch(setAccessToken(token));
+                    return; // ⛔ ВАЖНО: дальше не идём
                 }
             } catch {
-                // не залогинен — нормально
-            } finally {
-                dispatch(setAuthReady());
+                // refresh невалиден — ок
             }
+
+            dispatch(setAuthReady()); // ⬅️ только если токена нет
         };
 
         init();
@@ -55,7 +57,6 @@ export default function App() {
             <Route element={<ProtectedRoute />}>
                 <Route path="/" element={<MainWithContext />}>
                     <Route index element={<Home />} />
-
                     <Route path="products" element={<ProductsManager />} />
                     <Route path="profile" element={<ProfilePage />} />
                     <Route path="cart" element={<CartPage />} />

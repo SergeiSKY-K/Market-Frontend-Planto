@@ -8,12 +8,15 @@ type Props = {
 };
 
 export default function ProtectedRoute({ allowedRoles }: Props) {
-    const { accessToken, ready } = useSelector((s: RootState) => s.token);
+    const { accessToken, ready } = useSelector(
+        (s: RootState) => s.token
+    );
 
 
     if (!ready) {
         return null;
     }
+
 
     if (!accessToken) {
         return <Navigate to="/login" replace />;
