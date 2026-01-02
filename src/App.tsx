@@ -25,6 +25,10 @@ import SupplierProductsPage from "./components/SupplierProductsPage";
 import ModeratorBlockedPage from "./components/ModeratorBlockedPage";
 import SuppliersPage from "./components/SuppliersPage";
 
+function sleep(ms: number) {
+    return new Promise(res => setTimeout(res, ms));
+}
+
 export default function App() {
     const dispatch = useDispatch();
     const ready = useSelector((s: RootState) => s.token.ready);
@@ -32,19 +36,40 @@ export default function App() {
     useEffect(() => {
         const init = async () => {
             try {
-                const resp = await axiosInstance.post("/auth/refresh");
+                for (let attempt = 1; attempt <= 3; attempt++) {
+                    try {
+                        const resp = await axiosInstance.post("/auth/refresh");
 
-                
-                const authHeader =
-                    resp.headers?.authorization || resp.headers?.Authorization;
 
-                const token = authHeader?.replace("Bearer ", "");
+                        const tokenFromBody = (resp.data as any)?.accessToken as string | undefined;
 
-                if (token) {
-                    dispatch(setAccessToken(token));
+
+                        const authHeader =
+                            resp.headers?.authorization || (resp.headers as any)?.Authorization;
+                        const tokenFromHeader = authHeader?.replace("Bearer ", "");
+
+                        const token = tokenFromBody || tokenFromHeader;
+
+                        if (token) {
+                            dispatch(setAccessToken(token));
+                        }
+
+                        break;
+                    } catch (e: any) {
+                        const status = e?.response?.status;
+
+
+                        if ([500, 502, 503, 504].includes(status) && attempt < 3) {
+                            await sleep(1200);
+                            continue;
+                        }
+
+
+                        break;
+                    }
                 }
-            } catch { /* empty */ } finally {
-               
+            } finally {
+
                 dispatch(setAuthReady());
             }
         };
@@ -52,7 +77,6 @@ export default function App() {
         init();
     }, [dispatch]);
 
-   
     if (!ready) return null;
 
     return (
