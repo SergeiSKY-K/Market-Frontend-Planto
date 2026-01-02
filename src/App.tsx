@@ -1,6 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+
 import axiosInstance from "./features/api/axiosInstance";
+import { setAccessToken } from "./store/tokenSlice";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainWithContext from "./components/MainWithContext";
@@ -22,21 +25,29 @@ import ModeratorBlockedPage from "./components/ModeratorBlockedPage";
 import SuppliersPage from "./components/SuppliersPage";
 
 export default function App() {
+    const dispatch = useDispatch();
     const [ready, setReady] = useState(false);
 
     useEffect(() => {
         const init = async () => {
             try {
-                await axiosInstance.post("/auth/refresh");
+                const resp = await axiosInstance.post("/auth/refresh");
+
+                const authHeader = resp.headers["authorization"];
+                const token = authHeader?.replace("Bearer ", "");
+
+                if (token) {
+                    dispatch(setAccessToken(token));
+                }
             } catch {
+                // не залогинен — нормально
             } finally {
                 setReady(true);
             }
         };
 
         init();
-    }, []);
-
+    }, [dispatch]);
 
     if (!ready) return null;
 
